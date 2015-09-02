@@ -40,6 +40,9 @@ to setup
   set-default-shape hidden-nodes "output-node"
   set-default-shape links "small-arrow-shape"
   
+  set hidden-layer-seq 0
+  set hidden-layer-num-nodes 0
+  
   set nodes-per-hidden-layer table:make
   
   ifelse auto-hidden-layers-nodes? 
@@ -51,10 +54,29 @@ to setup
     ]
     [
       init-nodes-per-hidden-layer 0 
+      
+      ask-user-input-num-nodes-per-layer
     ]
   ]
   
   set num-of-hidden-layers num-hidden-layers
+  
+end
+
+to ask-user-input-num-nodes-per-layer
+  
+  let i 1
+  
+  while [ i <= num-hidden-layers ]
+  [
+    let s-num user-input ( word "Enter number of nodes for lauyer " i ) 
+    
+    if is-number? s-num
+    [
+      table:put nodes-per-hidden-layer i ( read-from-string s-num )
+      set i i + 1
+    ]
+  ]
   
 end
 
@@ -71,7 +93,9 @@ to init-nodes-per-hidden-layer [value]
   
 end
 
-to update-table
+to update-layer [ layer-num num-nodes ]
+  
+  table:put nodes-per-hidden-layer layer-num num-nodes
   
 end
 
@@ -213,18 +237,18 @@ INPUTBOX
 283
 256
 hidden-layer-num-nodes
-0
+2
 1
 0
 Number
 
 BUTTON
 292
-225
+221
 459
-258
+254
 Update hidden layer table
-update-table
+if is-number? hidden-layer-seq and is-number? hidden-layer-num-nodes\nand hidden-layer-seq >= 1 and hidden-layer-seq <= 10\nand hidden-layer-num-nodes >= 1 and hidden-layer-num-nodes <= 30 \n[ \n update-layer hidden-layer-seq hidden-layer-num-nodes\n]
 NIL
 1
 T
@@ -242,7 +266,7 @@ SWITCH
 185
 uniform-hidden-layers?
 uniform-hidden-layers?
-1
+0
 1
 -1000
 
@@ -256,13 +280,13 @@ OUTPUT
 INPUTBOX
 21
 195
-125
+133
 255
 hidden-layer-seq
-NIL
+3
 1
 0
-String
+Number
 
 @#$#@#$#@
 ## WHAT IS IT?
