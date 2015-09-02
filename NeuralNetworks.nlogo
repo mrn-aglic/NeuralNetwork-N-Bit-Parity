@@ -1,3 +1,5 @@
+extensions [ table ]
+
 links-own [weight]
 
 breed [bias-nodes bias-node]
@@ -21,6 +23,8 @@ hidden-nodes-own [
 globals [
   
   epoch-error
+  num-of-hidden-layers
+  nodes-per-hidden-layer
 ]
 
 to setup
@@ -29,6 +33,16 @@ to setup
   clear-all  
   
   ask patches [ set pcolor 9.5 ]
+  
+  set-default-shape bias-nodes "bias-node"
+  set-default-shape input-nodes "circle"
+  set-default-shape output-nodes "output-node"
+  set-default-shape hidden-nodes "output-node"
+  set-default-shape links "small-arrow-shape"
+  
+  set nodes-per-hidden-layer table:make
+  
+  set num-of-hidden-layers num-hidden-layers
   
 end
 
@@ -68,7 +82,7 @@ ticks
 SLIDER
 25
 20
-245
+265
 53
 num-input-nodes
 num-input-nodes
@@ -83,7 +97,7 @@ HORIZONTAL
 SLIDER
 25
 69
-245
+264
 102
 num-output-nodes
 num-output-nodes
@@ -96,12 +110,12 @@ NIL
 HORIZONTAL
 
 BUTTON
-254
-19
-373
-52
+281
+21
+400
+54
 Setup network
-setup-network
+setup
 NIL
 1
 T
@@ -111,6 +125,73 @@ NIL
 NIL
 NIL
 1
+
+SLIDER
+25
+116
+264
+149
+num-hidden-layers
+num-hidden-layers
+0
+10
+1
+1
+1
+NIL
+HORIZONTAL
+
+SLIDER
+26
+195
+266
+228
+num-nodes-per-hidden-layer
+num-nodes-per-hidden-layer
+1
+30
+7
+1
+1
+NIL
+HORIZONTAL
+
+SWITCH
+25
+156
+265
+189
+auto-num-nodes-per-hidden-layer
+auto-num-nodes-per-hidden-layer
+1
+1
+-1000
+
+SLIDER
+25
+242
+267
+275
+hidden-layer
+hidden-layer
+0
+num-of-hidden-layers
+0
+1
+1
+NIL
+HORIZONTAL
+
+MONITOR
+26
+289
+591
+334
+Nodes per hidden layer
+nodes-per-hidden-layer
+17
+1
+11
 
 @#$#@#$#@
 ## WHAT IS IT?
@@ -163,6 +244,13 @@ arrow
 true
 0
 Polygon -7500403 true true 150 0 0 150 105 150 105 293 195 293 195 150 300 150
+
+bias-node
+false
+0
+Circle -16777216 true false 0 0 300
+Circle -7500403 true true 30 30 240
+Polygon -16777216 true false 120 60 150 60 165 60 165 225 180 225 180 240 135 240 135 225 150 225 150 75 135 75 150 60
 
 box
 false
@@ -314,6 +402,13 @@ line half
 true
 0
 Line -7500403 true 150 0 150 150
+
+output-node
+false
+1
+Circle -7500403 true false 0 0 300
+Circle -2674135 true true 30 30 240
+Polygon -7500403 true false 195 75 90 75 150 150 90 225 195 225 195 210 195 195 180 210 120 210 165 150 120 90 180 90 195 105 195 75
 
 pentagon
 false
@@ -471,6 +566,17 @@ true
 0
 Line -7500403 true 150 150 90 180
 Line -7500403 true 150 150 210 180
+
+small-arrow-shape
+0.0
+-0.2 0 0.0 1.0
+0.0 1 1.0 0.0
+0.2 0 0.0 1.0
+link direction
+true
+0
+Line -7500403 true 150 150 135 180
+Line -7500403 true 150 150 165 180
 
 @#$#@#$#@
 0
