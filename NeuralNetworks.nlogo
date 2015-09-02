@@ -51,6 +51,10 @@ to setup-network
   let node-size 20 / max ( list num-input-nodes num-output-nodes )
   
 end
+
+to update-table
+  
+end
 @#$#@#$#@
 GRAPHICS-WINDOW
 608
@@ -168,12 +172,12 @@ auto-num-nodes-per-hidden-layer
 -1000
 
 SLIDER
-25
-242
-267
-275
-hidden-layer
-hidden-layer
+27
+292
+269
+325
+choose-hidden-layer
+choose-hidden-layer
 0
 num-of-hidden-layers
 0
@@ -183,15 +187,54 @@ NIL
 HORIZONTAL
 
 MONITOR
-26
-289
-591
-334
+28
+361
+593
+406
 Nodes per hidden layer
 nodes-per-hidden-layer
 17
 1
 11
+
+INPUTBOX
+271
+292
+432
+352
+chosen-hidden-layer-num-nodes
+0
+1
+0
+Number
+
+BUTTON
+435
+294
+602
+327
+Update hidden layer table
+update-table
+NIL
+1
+T
+OBSERVER
+NIL
+NIL
+NIL
+NIL
+1
+
+SWITCH
+27
+244
+260
+277
+all-layers-same-num-nodes
+all-layers-same-num-nodes
+0
+1
+-1000
 
 @#$#@#$#@
 ## WHAT IS IT?
