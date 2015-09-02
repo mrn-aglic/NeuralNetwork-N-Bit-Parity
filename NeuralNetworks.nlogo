@@ -23,7 +23,9 @@ hidden-nodes-own [
 globals [
   
   epoch-error
-  num-of-hidden-layers
+  
+  num-in-nodes
+  num-out-nodes
   nodes-per-hidden-layer
 ]
 
@@ -43,10 +45,15 @@ to setup
   set hidden-layer-seq 0
   set hidden-layer-num-nodes 0
   
+  set num-input-nodes num-input-nodes
+  set num-output-nodes num-out-nodes
+  
   set nodes-per-hidden-layer table:make
   
-  ifelse auto-hidden-layers-nodes? 
-  []
+  ifelse auto-hidden-number-of-nodes? 
+  [
+    
+  ]
   [
     ifelse uniform-hidden-layers?
     [
@@ -59,7 +66,6 @@ to setup
     ]
   ]
   
-  set num-of-hidden-layers num-hidden-layers
   
 end
 
@@ -135,7 +141,7 @@ ticks
 SLIDER
 25
 20
-170
+203
 53
 num-input-nodes
 num-input-nodes
@@ -148,10 +154,10 @@ NIL
 HORIZONTAL
 
 SLIDER
-178
-19
-313
-52
+208
+21
+369
+54
 num-output-nodes
 num-output-nodes
 1
@@ -163,10 +169,10 @@ NIL
 HORIZONTAL
 
 BUTTON
-318
-20
-437
-53
+386
+22
+505
+55
 Setup network
 setup
 NIL
@@ -212,10 +218,10 @@ HORIZONTAL
 SWITCH
 20
 107
-260
+252
 140
-auto-hidden-layers-nodes?
-auto-hidden-layers-nodes?
+auto-hidden-number-of-nodes?
+auto-hidden-number-of-nodes?
 1
 1
 -1000
@@ -237,7 +243,7 @@ INPUTBOX
 283
 256
 hidden-layer-num-nodes
-2
+0
 1
 0
 Number
@@ -283,7 +289,7 @@ INPUTBOX
 133
 255
 hidden-layer-seq
-3
+0
 1
 0
 Number
