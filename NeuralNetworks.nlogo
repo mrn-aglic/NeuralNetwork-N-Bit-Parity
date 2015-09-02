@@ -42,19 +42,42 @@ to setup
   
   set nodes-per-hidden-layer table:make
   
-  
+  ifelse auto-hidden-layers-nodes? 
+  []
+  [
+    ifelse uniform-hidden-layers?
+    [
+      init-nodes-per-hidden-layer num-nodes-per-hidden-layer
+    ]
+    [
+      init-nodes-per-hidden-layer 0 
+    ]
+  ]
   
   set num-of-hidden-layers num-hidden-layers
+  
+end
+
+to init-nodes-per-hidden-layer [value]
+  
+  let i 1
+  
+  while [ i <= num-hidden-layers ]
+  [
+    table:put nodes-per-hidden-layer i value
+    
+    set i i + 1
+  ]
+  
+end
+
+to update-table
   
 end
 
 to setup-network
   
   let node-size 20 / max ( list num-input-nodes num-output-nodes )
-  
-end
-
-to update-table
   
 end
 @#$#@#$#@
@@ -141,7 +164,7 @@ num-hidden-layers
 num-hidden-layers
 0
 10
-1
+10
 1
 1
 NIL
@@ -167,32 +190,17 @@ SWITCH
 107
 260
 140
-hidden-layers-auto-num-nodes?
-hidden-layers-auto-num-nodes?
+auto-hidden-layers-nodes?
+auto-hidden-layers-nodes?
 1
 1
 -1000
 
-SLIDER
-19
-195
-194
-228
-choose-hidden-layer
-choose-hidden-layer
-0
-num-of-hidden-layers
-0
-1
-1
-NIL
-HORIZONTAL
-
 MONITOR
-20
-261
-585
-306
+18
+264
+486
+309
 Nodes per hidden layer
 nodes-per-hidden-layer
 17
@@ -200,21 +208,21 @@ nodes-per-hidden-layer
 11
 
 INPUTBOX
-212
-194
-398
-254
-chosen-hidden-layer-num-nodes
+140
+196
+283
+256
+hidden-layer-num-nodes
 0
 1
 0
 Number
 
 BUTTON
-419
-190
-586
-223
+292
+225
+459
+258
 Update hidden layer table
 update-table
 NIL
@@ -234,16 +242,27 @@ SWITCH
 185
 uniform-hidden-layers?
 uniform-hidden-layers?
-0
+1
 1
 -1000
 
 OUTPUT
-15
-320
-600
-556
+13
+316
+598
+552
 12
+
+INPUTBOX
+21
+195
+125
+255
+hidden-layer-seq
+NIL
+1
+0
+String
 
 @#$#@#$#@
 ## WHAT IS IT?
