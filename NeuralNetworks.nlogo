@@ -42,6 +42,8 @@ to setup
   
   set nodes-per-hidden-layer table:make
   
+  
+  
   set num-of-hidden-layers num-hidden-layers
   
 end
@@ -86,7 +88,7 @@ ticks
 SLIDER
 25
 20
-265
+170
 53
 num-input-nodes
 num-input-nodes
@@ -99,10 +101,10 @@ NIL
 HORIZONTAL
 
 SLIDER
-25
-69
-264
-102
+178
+19
+313
+52
 num-output-nodes
 num-output-nodes
 1
@@ -114,10 +116,10 @@ NIL
 HORIZONTAL
 
 BUTTON
-281
-21
-400
-54
+318
+20
+437
+53
 Setup network
 setup
 NIL
@@ -131,10 +133,10 @@ NIL
 1
 
 SLIDER
-25
-116
-264
-149
+23
+64
+170
+97
 num-hidden-layers
 num-hidden-layers
 0
@@ -146,10 +148,10 @@ NIL
 HORIZONTAL
 
 SLIDER
-26
-195
-266
-228
+278
+106
+469
+139
 num-nodes-per-hidden-layer
 num-nodes-per-hidden-layer
 1
@@ -161,21 +163,21 @@ NIL
 HORIZONTAL
 
 SWITCH
-25
-156
-265
-189
-auto-num-nodes-per-hidden-layer
-auto-num-nodes-per-hidden-layer
+20
+107
+260
+140
+hidden-layers-auto-num-nodes?
+hidden-layers-auto-num-nodes?
 1
 1
 -1000
 
 SLIDER
-27
-292
-269
-325
+19
+195
+194
+228
 choose-hidden-layer
 choose-hidden-layer
 0
@@ -187,10 +189,10 @@ NIL
 HORIZONTAL
 
 MONITOR
-28
-361
-593
-406
+20
+261
+585
+306
 Nodes per hidden layer
 nodes-per-hidden-layer
 17
@@ -198,10 +200,10 @@ nodes-per-hidden-layer
 11
 
 INPUTBOX
-271
-292
-432
-352
+212
+194
+398
+254
 chosen-hidden-layer-num-nodes
 0
 1
@@ -209,10 +211,10 @@ chosen-hidden-layer-num-nodes
 Number
 
 BUTTON
-435
-294
-602
-327
+419
+190
+586
+223
 Update hidden layer table
 update-table
 NIL
@@ -226,15 +228,22 @@ NIL
 1
 
 SWITCH
-27
-244
-260
-277
-all-layers-same-num-nodes
-all-layers-same-num-nodes
+19
+152
+261
+185
+uniform-hidden-layers?
+uniform-hidden-layers?
 0
 1
 -1000
+
+OUTPUT
+15
+320
+600
+556
+12
 
 @#$#@#$#@
 ## WHAT IS IT?
