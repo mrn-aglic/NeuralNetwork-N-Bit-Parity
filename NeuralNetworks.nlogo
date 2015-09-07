@@ -69,7 +69,7 @@ to setup
   
 end
 
-to-report tryAndDontThrow [ code ]
+to-report tryRunResult [ code ]
   
   let var ""
   
@@ -93,7 +93,7 @@ to ask-user-input-num-nodes-per-layer
   [
     let s-num user-input ( word "Enter number of nodes for layer " i ) 
     
-    let optionNum ( tryAndDontThrow ( task [ read-from-string s-num ] ) )
+    let optionNum ( tryRunResult ( task [ read-from-string s-num ] ) )
     
     if is-number? optionNum
     [
