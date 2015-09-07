@@ -69,17 +69,35 @@ to setup
   
 end
 
+to-report tryAndDontThrow [ code ]
+  
+  let var ""
+  
+  carefully
+  [
+    set var run-result code
+  ]
+  [
+    report error-message
+  ]
+  
+  report var
+  
+end
+
 to ask-user-input-num-nodes-per-layer
   
   let i 1
   
   while [ i <= num-hidden-layers ]
   [
-    let s-num user-input ( word "Enter number of nodes for lauyer " i ) 
+    let s-num user-input ( word "Enter number of nodes for layer " i ) 
     
-    if is-number? s-num
+    let optionNum ( tryAndDontThrow ( task [ read-from-string s-num ] ) )
+    
+    if is-number? optionNum
     [
-      table:put nodes-per-hidden-layer i ( read-from-string s-num )
+      table:put nodes-per-hidden-layer i optionNum
       set i i + 1
     ]
   ]
@@ -162,7 +180,7 @@ num-output-nodes
 num-output-nodes
 1
 20
-3
+0
 1
 1
 NIL
