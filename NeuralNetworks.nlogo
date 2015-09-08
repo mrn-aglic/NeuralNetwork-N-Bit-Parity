@@ -1,13 +1,18 @@
 extensions [ table ]
 
-links-own [weight]
+links-own [ weight ]
 
-breed [bias-nodes bias-node]
-breed [input-nodes input-node]
-breed [output-nodes output-node]
-breed [hidden-nodes hidden-node]
+breed [ bias-nodes bias-node ]
+breed [ input-nodes input-node ]
+breed [ output-nodes output-node ]
+breed [ hidden-nodes hidden-node ]
 
-bias-nodes-own [ activation err ]
+bias-nodes-own [ 
+  activation 
+  err 
+  input-bias?
+  layer
+]
 
 input-nodes-own [ activation err ]
 
@@ -42,11 +47,8 @@ to setup
   set-default-shape hidden-nodes "output-node"
   set-default-shape links "small-arrow-shape"
   
-  set hidden-layer-seq 0
-  set hidden-layer-num-nodes 0
-  
-  set num-input-nodes num-input-nodes
-  set num-output-nodes num-out-nodes
+  set num-in-nodes num-input-nodes
+  set num-out-nodes num-output-nodes
   
   set nodes-per-hidden-layer table:make
   
@@ -66,6 +68,104 @@ to setup
     ]
   ]
   
+  create-nodes
+  position-nodes
+  
+  if not any-above 10
+  [
+    ask turtles 
+    [
+      set size 2
+    ]
+  ]
+  
+end
+
+to-report any-above [input]
+  
+  foreach table:keys nodes-per-hidden-layer
+  [
+    if table:get nodes-per-hidden-layer ? > 10
+    [ report true ]
+  ]
+  
+  report false
+  
+end
+
+to create-nodes
+  
+  create-bias-nodes num-hidden-layers + 1 [ set color yellow set activation 1 ]
+  create-input-nodes num-in-nodes [ set color green ]
+  create-output-nodes num-out-nodes [ set color red]
+  
+  foreach table:keys nodes-per-hidden-layer
+  [
+    create-hidden-nodes table:get nodes-per-hidden-layer ? 
+    [
+      set layer ?
+      set color blue
+    ]
+  ] 
+  
+end
+
+to position-nodes
+  
+  position-in-nodes
+  position-hidden-nodes
+  position-out-nodes
+  
+end
+
+to position-in-nodes
+  
+  let inx max-pxcor / ( num-hidden-layers + 3 )
+  let iny max-pycor
+  let d ceiling  ( - ( min-pycor /  ( num-in-nodes + 1 ) ) )
+  
+  foreach (sort-on [who] input-nodes )
+  [
+    set iny iny - d
+    
+    ask ? [ setxy inx iny ]
+  ]
+  
+end
+
+to position-hidden-nodes
+  
+  let hx max-pxcor / ( num-hidden-layers + 3 )
+  
+  foreach table:keys nodes-per-hidden-layer 
+  [
+    let hy max-pycor
+    
+    let ddy ceiling ( - ( min-pycor / ( table:get nodes-per-hidden-layer ? + 1 ) ) )
+    let l ?
+    
+    foreach sort-on [who] hidden-nodes with [layer = l]
+    [
+      set hy hy - ddy
+      
+      ask ? [ setxy (hx + l * hx) hy ] 
+    ]
+  ]
+  
+end
+
+to position-out-nodes
+  
+  let outx max-pxcor / ( num-hidden-layers + 3 )
+  let outy max-pycor
+  let d ceiling ( - ( min-pycor / ( num-out-nodes + 1 ) ) )
+  
+  foreach (sort-on [who] output-nodes)
+  [
+    set outy outy - d
+    
+    ask ? [ setxy ( max-pxcor - outx ) outy ]
+  ]
   
 end
 
@@ -131,24 +231,24 @@ end
 @#$#@#$#@
 GRAPHICS-WINDOW
 608
-23
-1393
-555
+17
+1391
+688
 -1
 -1
-15.2
+10.1831
 1
 10
 1
 1
 1
 0
-1
-1
+0
+0
 1
 0
-50
--32
+75
+-62
 0
 0
 0
@@ -180,7 +280,7 @@ num-output-nodes
 num-output-nodes
 1
 20
-0
+3
 1
 1
 NIL
@@ -212,7 +312,7 @@ num-hidden-layers
 num-hidden-layers
 0
 10
-10
+3
 1
 1
 NIL
@@ -261,7 +361,7 @@ INPUTBOX
 283
 256
 hidden-layer-num-nodes
-0
+5
 1
 0
 Number
@@ -307,7 +407,7 @@ INPUTBOX
 133
 255
 hidden-layer-seq
-0
+4
 1
 0
 Number
