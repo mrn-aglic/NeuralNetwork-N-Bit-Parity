@@ -1,3 +1,5 @@
+__includes [ "code/utils.nls" "code/nn_positionNodes.nls" ]
+
 extensions [ table ]
 
 links-own [ weight ]
@@ -33,6 +35,12 @@ globals [
   num-out-nodes
   nodes-per-hidden-layer
 ]
+
+to startup
+  
+  setup
+  
+end
 
 to setup
   
@@ -114,99 +122,6 @@ to create-nodes
       set color blue
     ]
   ] 
-  
-end
-
-to position-nodes
-  
-  position-in-nodes
-  position-hidden-nodes
-  position-out-nodes
-  
-end
-
-to position-in-nodes
-  
-  let inx max-pxcor / ( num-hidden-layers + 3 )
-  let iny max-pycor
-  let d ceiling  ( - ( min-pycor /  ( num-in-nodes + 2 ) ) )
-  
-  ask min-one-of bias-nodes [who] 
-  [
-    set iny iny - d
-    
-    setxy inx iny
-    
-    set input-bias? true
-  ]
-  
-  foreach (sort-on [who] input-nodes )
-  [
-    set iny iny - d
-    
-    ask ? [ setxy inx iny ]
-  ]
-  
-end
-
-to position-hidden-nodes
-  
-  let hx max-pxcor / ( num-hidden-layers + 3 )
-  
-  foreach table:keys nodes-per-hidden-layer 
-  [
-    let hy max-pycor
-    
-    let ddy ceiling ( - ( min-pycor / ( table:get nodes-per-hidden-layer ? + 2 ) ) )
-    let l ?
-    
-    ask min-one-of bias-nodes with [ layer = 0 and not input-bias? ] [who] 
-    [
-      set layer l
-      
-      set hy hy - ddy
-      
-      setxy ( hx + l * hx ) hy 
-    ]
-    
-    foreach sort-on [who] hidden-nodes with [layer = l]
-    [
-      set hy hy - ddy
-      
-      ask ? [ setxy (hx + l * hx) hy ] 
-    ]
-  ]
-  
-end
-
-to position-out-nodes
-  
-  let outx max-pxcor / ( num-hidden-layers + 3 )
-  let outy max-pycor
-  let d ceiling ( - ( min-pycor / ( num-out-nodes + 1 ) ) )
-  
-  foreach (sort-on [who] output-nodes)
-  [
-    set outy outy - d
-    
-    ask ? [ setxy ( max-pxcor - outx ) outy ]
-  ]
-  
-end
-
-to-report tryRunResult [ code ]
-  
-  let var ""
-  
-  carefully
-  [
-    set var run-result code
-  ]
-  [
-    report error-message
-  ]
-  
-  report var
   
 end
 

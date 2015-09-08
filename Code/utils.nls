@@ -1,0 +1,15 @@
+to-report tryRunResult [ code ]
+  
+  let var ""
+  
+  carefully
+  [
+    set var run-result code
+  ]
+  [
+    report error-message
+  ]
+  
+  report var
+  
+end
