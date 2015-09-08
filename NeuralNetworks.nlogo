@@ -95,7 +95,14 @@ end
 
 to create-nodes
   
-  create-bias-nodes num-hidden-layers + 1 [ set color yellow set activation 1 ]
+  create-bias-nodes num-hidden-layers + 1 
+  [
+    set color yellow 
+    set activation 1 
+    set layer 0 
+    set input-bias? false 
+  ]
+  
   create-input-nodes num-in-nodes [ set color green ]
   create-output-nodes num-out-nodes [ set color red]
   
@@ -122,7 +129,16 @@ to position-in-nodes
   
   let inx max-pxcor / ( num-hidden-layers + 3 )
   let iny max-pycor
-  let d ceiling  ( - ( min-pycor /  ( num-in-nodes + 1 ) ) )
+  let d ceiling  ( - ( min-pycor /  ( num-in-nodes + 2 ) ) )
+  
+  ask min-one-of bias-nodes [who] 
+  [
+    set iny iny - d
+    
+    setxy inx iny
+    
+    set input-bias? true
+  ]
   
   foreach (sort-on [who] input-nodes )
   [
@@ -141,8 +157,17 @@ to position-hidden-nodes
   [
     let hy max-pycor
     
-    let ddy ceiling ( - ( min-pycor / ( table:get nodes-per-hidden-layer ? + 1 ) ) )
+    let ddy ceiling ( - ( min-pycor / ( table:get nodes-per-hidden-layer ? + 2 ) ) )
     let l ?
+    
+    ask min-one-of bias-nodes with [ layer = 0 and not input-bias? ] [who] 
+    [
+      set layer l
+      
+      set hy hy - ddy
+      
+      setxy ( hx + l * hx ) hy 
+    ]
     
     foreach sort-on [who] hidden-nodes with [layer = l]
     [
