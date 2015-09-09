@@ -34,6 +34,11 @@ globals [
   num-in-nodes
   num-out-nodes
   nodes-per-hidden-layer
+  
+  ;;;;;;;;
+  ff-connections-color
+  
+  learning-connections-color
 ]
 
 to startup
@@ -54,6 +59,9 @@ to setup
   set-default-shape output-nodes "output-node"
   set-default-shape hidden-nodes "output-node"
   set-default-shape links "small-arrow-shape"
+  
+  set ff-connections-color cyan
+  set learning-connections-color red
   
   set num-in-nodes num-input-nodes
   set num-out-nodes num-output-nodes
@@ -86,6 +94,38 @@ to setup
       set size 2
     ]
   ]
+  
+end
+
+to connect-nodes [ from _to ]
+  
+  ask from 
+  [ 
+    create-links-to _to [set color ff-connections-color ]
+    create-links-from _to [ set hidden? true set color learning-connections-color ]
+  ]
+  
+end
+
+to remove-connection [ _link ]
+  
+  ask _link [ die ]
+  
+end
+
+to full-connect-layers [ from _to ]
+
+  ask from 
+  [
+    create-links-to _to [ set color ff-connections-color ]
+    create-links-from _to [ set hidden? true set color learning-connections-color ] 
+  ]
+
+end
+
+to full-connect-all-layers
+  
+  
   
 end
 
@@ -173,7 +213,7 @@ GRAPHICS-WINDOW
 608
 17
 1391
-688
+689
 -1
 -1
 10.1831
