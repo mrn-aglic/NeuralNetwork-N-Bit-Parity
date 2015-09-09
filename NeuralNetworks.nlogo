@@ -14,6 +14,7 @@ bias-nodes-own [
   err 
   input-bias?
   layer
+  added-to-layer?
 ]
 
 input-nodes-own [ activation err ]
@@ -125,6 +126,18 @@ end
 
 to full-connect-all-layers
   
+  ifelse num-hidden-layers <= 0
+  [ 
+    full-connect-layers ( turtle-set input-nodes ( bias-nodes with [ input-bias? ] ) ) output-nodes
+  ]
+  [
+    full-connect-layers ( turtle-set input-nodes ( bias-nodes with [ input-bias? ] ) ) ( hidden-nodes with [ layer = 0 ] )
+    
+    foreach ( n-values num-hidden-layers [ ? ] )
+    [
+      
+    ] 
+  ]
   
   
 end
@@ -148,6 +161,7 @@ to create-nodes
     set color yellow 
     set activation 1 
     set layer 0 
+    set added-to-layer? false
     set input-bias? false 
   ]
   
@@ -167,9 +181,9 @@ end
 
 to ask-user-input-num-nodes-per-layer
   
-  let i 1
+  let i 0
   
-  while [ i <= num-hidden-layers ]
+  while [ i < num-hidden-layers ]
   [
     let s-num user-input ( word "Enter number of nodes for layer " i ) 
     
@@ -186,9 +200,9 @@ end
 
 to init-nodes-per-hidden-layer [value]
   
-  let i 1
+  let i 0
   
-  while [ i <= num-hidden-layers ]
+  while [ i < num-hidden-layers ]
   [
     table:put nodes-per-hidden-layer i value
     
