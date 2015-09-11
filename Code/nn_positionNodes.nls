@@ -48,7 +48,7 @@ to position-hidden-nodes
       
       set hy hy - ddy
       
-      setxy ( hx + ( l + 1) * hx ) hy 
+      setxy ( hx + ( l + 1 ) * hx ) hy 
       
       set added-to-layer? true
     ]

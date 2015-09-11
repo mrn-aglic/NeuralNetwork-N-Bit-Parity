@@ -1,0 +1,100 @@
+globals 
+[
+  selected-first
+  selected-second
+  
+  selected-first-color
+  selected-second-color
+]
+
+to-report distance-other-end-mouse [ candidateEnd ]
+  
+  let ds []
+  
+  ask candidateEnd
+  [
+    ask other-end 
+    [
+      set ds fput ( distancexy mouse-xcor mouse-ycor ) ds
+    ]
+  ]
+  
+  report min ds
+  
+end
+
+to remove-link-by-mouse 
+  
+  if mouse-down? [
+    
+    let candidateEnd min-one-of turtles [ distancexy mouse-xcor mouse-ycor ]
+    
+    let potentialLinks links with [ end1 = candidateEnd or end2 = candidateEnd ]
+  
+    let chosenLink min-one-of potentialLinks [ distance-other-end-mouse candidateEnd ]
+    
+    if chosenLink != nobody [
+       
+      ask chosenLink [ die ]
+      wait 0.5
+    ]
+  ]
+  
+end
+
+to select-node
+  
+  if mouse-down? 
+  [
+     let candidate min-one-of turtles [ distancexy mouse-xcor mouse-ycor ]
+     
+     if selected-second != nobody 
+     [
+       ask selected-second [ set color selected-second-color ] 
+       set selected-second nobody
+     ]
+     
+     ifelse selected-first = nobody 
+     [
+       set selected-first candidate
+       set selected-first-color [ color ] of candidate
+     ]
+     [
+       set selected-second candidate
+       set selected-second-color [ color ] of candidate
+     ]
+     
+     ask candidate [ set color violet ]
+  ]
+  
+end
+
+to remove-link 
+  
+  let selectedLink one-of links with [ ( end1 = selected-first and end2 = selected-second ) or ( end1 = selected-second and end2 = selected-first ) ]
+  
+  show selectedLink
+  
+  if is-link? selectedLink
+  [
+    ask selectedLink [ 
+      
+      ask link [who] of end2 [who] of end1 [ die ]
+      die 
+    ]  
+  ]
+  
+end
+
+to clear-selection
+  
+  ask selected-first [ set color selected-first-color ]
+  ask selected-second [ set color selected-second-color ]
+  
+  set selected-first nobody
+  set selected-second nobody
+  
+  set selected-first-color 0
+  set selected-second-color 0
+  
+end

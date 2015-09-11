@@ -1,4 +1,4 @@
-__includes [ "code/utils.nls" "code/nn_positionNodes.nls" ]
+__includes [ "code/utils.nls" "code/manipulationUtils.nls" "code/nn_positionNodes.nls" ]
 
 extensions [ table ]
 
@@ -67,6 +67,12 @@ to setup
   set num-in-nodes num-input-nodes
   set num-out-nodes num-output-nodes
   
+  set hidden-layer-seq -1
+  set hidden-layer-num-nodes -1
+  
+  set selected-first nobody
+  set selected-second nobody
+  
   set nodes-per-hidden-layer table:make
   
   ifelse auto-hidden-number-of-nodes? 
@@ -88,6 +94,8 @@ to setup
   create-nodes
   position-nodes
   
+  full-connect-all-layers
+  
   if not any-above 10
   [
     ask turtles 
@@ -95,22 +103,6 @@ to setup
       set size 2
     ]
   ]
-  
-end
-
-to connect-nodes [ from _to ]
-  
-  ask from 
-  [ 
-    create-links-to _to [set color ff-connections-color ]
-    create-links-from _to [ set hidden? true set color learning-connections-color ]
-  ]
-  
-end
-
-to remove-connection [ _link ]
-  
-  ask _link [ die ]
   
 end
 
@@ -133,10 +125,12 @@ to full-connect-all-layers
   [
     full-connect-layers ( turtle-set input-nodes ( bias-nodes with [ input-bias? ] ) ) ( hidden-nodes with [ layer = 0 ] )
     
-    foreach ( n-values num-hidden-layers [ ? ] )
+    foreach ( n-values ( num-hidden-layers - 1 ) [ ? ] )
     [
-      
+      full-connect-layers ( turtle-set ( hidden-nodes with [ layer = ? ] ) ( bias-nodes with [ layer = ? ] ) ) ( hidden-nodes with [ layer = ? + 1 ] )
     ] 
+    
+    full-connect-layers ( turtle-set ( hidden-nodes with [ layer = num-hidden-layers - 1 ] ) ( bias-nodes with [ layer = num-hidden-layers - 1 ] ) ) ( output-nodes ) 
   ]
   
   
@@ -160,7 +154,7 @@ to create-nodes
   [
     set color yellow 
     set activation 1 
-    set layer 0 
+    set layer -1
     set added-to-layer? false
     set input-bias? false 
   ]
@@ -224,13 +218,13 @@ to setup-network
 end
 @#$#@#$#@
 GRAPHICS-WINDOW
-608
-17
-1391
-689
+604
+8
+1408
+636
 -1
 -1
-10.1831
+6.562
 1
 10
 1
@@ -241,8 +235,8 @@ GRAPHICS-WINDOW
 0
 1
 0
-75
--62
+120
+-90
 0
 0
 0
@@ -355,7 +349,7 @@ INPUTBOX
 283
 256
 hidden-layer-num-nodes
-5
+-1
 1
 0
 Number
@@ -392,7 +386,7 @@ OUTPUT
 13
 316
 598
-552
+628
 12
 
 INPUTBOX
@@ -401,10 +395,100 @@ INPUTBOX
 133
 255
 hidden-layer-seq
-4
+-1
 1
 0
 Number
+
+BUTTON
+290
+151
+460
+184
+Remove link (mouse)
+remove-link-by-mouse
+T
+1
+T
+OBSERVER
+NIL
+NIL
+NIL
+NIL
+1
+
+BUTTON
+469
+221
+592
+254
+Clear selection
+clear-selection
+NIL
+1
+T
+OBSERVER
+NIL
+NIL
+NIL
+NIL
+1
+
+BUTTON
+478
+62
+583
+95
+select-node
+select-node
+T
+1
+T
+OBSERVER
+NIL
+NIL
+NIL
+NIL
+1
+
+BUTTON
+493
+265
+598
+298
+Remove link
+remove-link
+NIL
+1
+T
+OBSERVER
+NIL
+NIL
+NIL
+NIL
+1
+
+MONITOR
+476
+106
+572
+151
+selected-first
+selected-first
+17
+1
+11
+
+MONITOR
+475
+165
+591
+210
+selected-second
+selected-second
+17
+1
+11
 
 @#$#@#$#@
 ## WHAT IS IT?
