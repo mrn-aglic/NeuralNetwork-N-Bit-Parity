@@ -77,7 +77,7 @@ to setup
   
   ifelse auto-hidden-number-of-nodes? 
   [
-    
+    let num-hid-nodes ceiling ( ( num-in-nodes + num-out-nodes ) / 2 )
   ]
   [
     ifelse uniform-hidden-layers?
