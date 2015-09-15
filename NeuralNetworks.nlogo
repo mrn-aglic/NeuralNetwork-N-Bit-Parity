@@ -1,4 +1,4 @@
-__includes [ "code/utils.nls" "code/manipulationUtils.nls" "code/nn_positionNodes.nls" ]
+__includes [ "code/utils.nls" "code/manipulationUtils.nls" "code/nn_positionNodes.nls" "code/backpropagation.nls" "code/learningutils.nls" ]
 
 extensions [ table ]
 
@@ -29,8 +29,6 @@ hidden-nodes-own [
 ]
 
 globals [
-  
-  epoch-error
   
   num-in-nodes
   num-out-nodes
@@ -208,12 +206,6 @@ end
 to update-layer [ layer-num num-nodes ]
   
   table:put nodes-per-hidden-layer layer-num num-nodes
-  
-end
-
-to setup-network
-  
-  let node-size 20 / max ( list num-input-nodes num-output-nodes )
   
 end
 @#$#@#$#@
@@ -489,6 +481,21 @@ selected-second
 17
 1
 11
+
+SLIDER
+606
+648
+778
+681
+sigmoid-param-a
+sigmoid-param-a
+1
+25
+1
+1
+1
+NIL
+HORIZONTAL
 
 @#$#@#$#@
 ## WHAT IS IT?

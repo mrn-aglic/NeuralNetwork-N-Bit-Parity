@@ -1,0 +1,57 @@
+globals 
+[
+  epoch-error
+  stop-criteria-met
+]
+
+to train
+  
+  set epoch-error 0
+  set stop-criteria-met false
+  
+end
+
+to activate-inputs [ input-data ]
+  
+  let i 0
+  
+  foreach sort-on [ who ] input-nodes
+  [
+    ask ? 
+    [
+      set activation ( item i input-data )
+    ]
+    
+    set i i + 1 
+  ] 
+  
+end
+
+to propagate
+  
+  foreach ( n-values num-hidden-layers [?] )
+  [
+    ask hidden-nodes with [ layer = ? ]
+    [
+      set activation new-activation
+    ]
+  ]
+  
+  ask output-nodes 
+  [
+    set activation new-activation
+  ]
+  
+end
+
+to-report new-activation
+  
+  report ( sigmoid induced-local-field )
+  
+end
+
+to-report induced-local-field
+  
+  report sum [ [ activation ] of end1 * weight ] of my-in-links
+  
+end
