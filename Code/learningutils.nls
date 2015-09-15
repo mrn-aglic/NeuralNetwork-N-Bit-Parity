@@ -1,0 +1,5 @@
+to-report sigmoid [ input ]
+  
+  report 1 / ( 1 + e ^ ( - input * sigmoid-param-a ) )
+  
+end 
