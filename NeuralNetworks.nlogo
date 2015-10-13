@@ -486,6 +486,61 @@ selected-second
 1
 11
 
+SLIDER
+605
+648
+777
+681
+sigmoid-param-a
+sigmoid-param-a
+1
+25
+1
+1
+1
+NIL
+HORIZONTAL
+
+SLIDER
+955
+647
+1127
+680
+wrandom-mean
+wrandom-mean
+0.1
+1
+0.2
+0.1
+1
+NIL
+HORIZONTAL
+
+CHOOSER
+788
+644
+942
+689
+w-random
+w-random
+"random-float" "random-poisson" "random-uniform"
+0
+
+SLIDER
+1143
+649
+1315
+682
+std-deviation
+std-deviation
+0.1
+1
+0.1
+0.1
+1
+NIL
+HORIZONTAL
+
 @#$#@#$#@
 ## WHAT IS IT?
 
@@ -537,6 +592,13 @@ arrow
 true
 0
 Polygon -7500403 true true 150 0 0 150 105 150 105 293 195 293 195 150 300 150
+
+bias-node
+false
+0
+Circle -16777216 true false 0 0 300
+Circle -7500403 true true 30 30 240
+Polygon -16777216 true false 120 60 150 60 165 60 165 225 180 225 180 240 135 240 135 225 150 225 150 75 135 75 150 60
 
 box
 false
@@ -688,6 +750,13 @@ line half
 true
 0
 Line -7500403 true 150 0 150 150
+
+output-node
+false
+1
+Circle -7500403 true false 0 0 300
+Circle -2674135 true true 30 30 240
+Polygon -7500403 true false 195 75 90 75 150 150 90 225 195 225 195 210 195 195 180 210 120 210 165 150 120 90 180 90 195 105 195 75
 
 pentagon
 false
@@ -845,6 +914,17 @@ true
 0
 Line -7500403 true 150 150 90 180
 Line -7500403 true 150 150 210 180
+
+small-arrow-shape
+0.0
+-0.2 0 0.0 1.0
+0.0 1 1.0 0.0
+0.2 0 0.0 1.0
+link direction
+true
+0
+Line -7500403 true 150 150 135 180
+Line -7500403 true 150 150 165 180
 
 @#$#@#$#@
 0
