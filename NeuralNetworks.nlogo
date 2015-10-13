@@ -502,9 +502,9 @@ NIL
 HORIZONTAL
 
 SLIDER
-955
+974
 647
-1127
+1146
 680
 wrandom-mean
 wrandom-mean
@@ -519,22 +519,22 @@ HORIZONTAL
 CHOOSER
 788
 644
-942
+965
 689
 w-random
 w-random
-"random-float" "random-poisson" "random-uniform"
+"random-float" "random-normal" "random-poisson" "random-exponential"
 0
 
 SLIDER
-1143
+1162
 649
-1315
+1334
 682
 std-deviation
 std-deviation
 0.1
-1
+0.5
 0.1
 0.1
 1
