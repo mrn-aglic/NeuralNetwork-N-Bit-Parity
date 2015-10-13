@@ -9,9 +9,9 @@ breed [ input-nodes input-node ]
 breed [ output-nodes output-node ]
 breed [ hidden-nodes hidden-node ]
 
-bias-nodes-own [ 
-  activation 
-  err 
+bias-nodes-own [
+  activation
+  err
   input-bias?
   layer
   added-to-layer?
@@ -22,60 +22,60 @@ input-nodes-own [ activation err ]
 output-nodes-own [ activation err ]
 
 hidden-nodes-own [
-  
+
   activation
   err
   layer
 ]
 
 globals [
-  
+
   num-in-nodes
   num-out-nodes
   nodes-per-hidden-layer
-  
+
   ;;;;;;;;
   ff-connections-color
-  
+
   learning-connections-color
 ]
 
 to startup
-  
+
   setup
-  
+
 end
 
 to setup
-  
+
   file-close-all
-  clear-all  
-  
+  clear-all
+
   ask patches [ set pcolor 9.5 ]
-  
+
   set-default-shape bias-nodes "bias-node"
   set-default-shape input-nodes "circle"
   set-default-shape output-nodes "output-node"
   set-default-shape hidden-nodes "output-node"
   set-default-shape links "small-arrow-shape"
-  
+
   set ff-connections-color cyan
   set learning-connections-color red
-  
+
   set num-in-nodes num-input-nodes
   set num-out-nodes num-output-nodes
-  
+
   set hidden-layer-seq -1
   set hidden-layer-num-nodes -1
-  
+
   set selected-first nobody
   set selected-second nobody
-  
+
   set nodes-per-hidden-layer table:make
-  
-  ifelse auto-hidden-number-of-nodes? 
+
+  ifelse auto-hidden-number-of-nodes?
   [
-    
+    let num-hid-nodes ceiling ( ( num-in-nodes + num-out-nodes ) / 2 )
   ]
   [
     ifelse uniform-hidden-layers?
@@ -83,130 +83,134 @@ to setup
       init-nodes-per-hidden-layer num-nodes-per-hidden-layer
     ]
     [
-      init-nodes-per-hidden-layer 0 
-      
+      init-nodes-per-hidden-layer 0
+
       ask-user-input-num-nodes-per-layer
     ]
   ]
-  
+
   create-nodes
   position-nodes
-  
+
   full-connect-all-layers
-  
+
   if not any-above 10
   [
-    ask turtles 
+    ask turtles
     [
       set size 2
     ]
   ]
-  
+
 end
 
 to full-connect-layers [ from _to ]
 
-  ask from 
+  ask from
   [
-    create-links-to _to [ set color ff-connections-color ]
-    create-links-from _to [ set hidden? true set color learning-connections-color ] 
+    create-links-to _to
+    [
+      set weight ( runresult ( word w-random " " wrandom-mean " - " (wrandom-mean / 2) " " ifelse-value ( w-random = "random-normal" ) [ ( word std-deviation ) ] [ "" ] ) )
+      set color ff-connections-color
+    ]
+    create-links-from _to [ set hidden? true set color learning-connections-color ]
   ]
 
 end
 
 to full-connect-all-layers
-  
+
   ifelse num-hidden-layers <= 0
-  [ 
+  [
     full-connect-layers ( turtle-set input-nodes ( bias-nodes with [ input-bias? ] ) ) output-nodes
   ]
   [
     full-connect-layers ( turtle-set input-nodes ( bias-nodes with [ input-bias? ] ) ) ( hidden-nodes with [ layer = 0 ] )
-    
+
     foreach ( n-values ( num-hidden-layers - 1 ) [ ? ] )
     [
       full-connect-layers ( turtle-set ( hidden-nodes with [ layer = ? ] ) ( bias-nodes with [ layer = ? ] ) ) ( hidden-nodes with [ layer = ? + 1 ] )
-    ] 
-    
-    full-connect-layers ( turtle-set ( hidden-nodes with [ layer = num-hidden-layers - 1 ] ) ( bias-nodes with [ layer = num-hidden-layers - 1 ] ) ) ( output-nodes ) 
+    ]
+
+    full-connect-layers ( turtle-set ( hidden-nodes with [ layer = num-hidden-layers - 1 ] ) ( bias-nodes with [ layer = num-hidden-layers - 1 ] ) ) ( output-nodes )
   ]
-  
-  
+
+
 end
 
 to-report any-above [input]
-  
+
   foreach table:keys nodes-per-hidden-layer
   [
     if table:get nodes-per-hidden-layer ? > 10
     [ report true ]
   ]
-  
+
   report false
-  
+
 end
 
 to create-nodes
-  
-  create-bias-nodes num-hidden-layers + 1 
+
+  create-bias-nodes num-hidden-layers + 1
   [
-    set color yellow 
-    set activation 1 
+    set color yellow
+    set activation 1
     set layer -1
     set added-to-layer? false
-    set input-bias? false 
+    set input-bias? false
   ]
-  
+
   create-input-nodes num-in-nodes [ set color green ]
   create-output-nodes num-out-nodes [ set color red]
-  
+
   foreach table:keys nodes-per-hidden-layer
   [
-    create-hidden-nodes table:get nodes-per-hidden-layer ? 
+    create-hidden-nodes table:get nodes-per-hidden-layer ?
     [
       set layer ?
       set color blue
     ]
-  ] 
-  
+  ]
+
 end
 
 to ask-user-input-num-nodes-per-layer
-  
+
   let i 0
-  
+
   while [ i < num-hidden-layers ]
   [
-    let s-num user-input ( word "Enter number of nodes for layer " i ) 
-    
+    let s-num user-input ( word "Enter number of nodes for layer " i )
+
     let optionNum ( tryRunResult ( task [ read-from-string s-num ] ) )
-    
+
     if is-number? optionNum
     [
       table:put nodes-per-hidden-layer i optionNum
       set i i + 1
     ]
   ]
-  
+
 end
 
 to init-nodes-per-hidden-layer [value]
-  
+
   let i 0
-  
+
   while [ i < num-hidden-layers ]
   [
     table:put nodes-per-hidden-layer i value
-    
+
     set i i + 1
   ]
-  
+
 end
 
 to update-layer [ layer-num num-nodes ]
-  
+
   table:put nodes-per-hidden-layer layer-num num-nodes
-  
+
 end
 @#$#@#$#@
 GRAPHICS-WINDOW
@@ -379,7 +383,7 @@ OUTPUT
 316
 598
 628
-12
+13
 
 INPUTBOX
 21
@@ -482,21 +486,6 @@ selected-second
 1
 11
 
-SLIDER
-606
-648
-778
-681
-sigmoid-param-a
-sigmoid-param-a
-1
-25
-1
-1
-1
-NIL
-HORIZONTAL
-
 @#$#@#$#@
 ## WHAT IS IT?
 
@@ -548,13 +537,6 @@ arrow
 true
 0
 Polygon -7500403 true true 150 0 0 150 105 150 105 293 195 293 195 150 300 150
-
-bias-node
-false
-0
-Circle -16777216 true false 0 0 300
-Circle -7500403 true true 30 30 240
-Polygon -16777216 true false 120 60 150 60 165 60 165 225 180 225 180 240 135 240 135 225 150 225 150 75 135 75 150 60
 
 box
 false
@@ -707,13 +689,6 @@ true
 0
 Line -7500403 true 150 0 150 150
 
-output-node
-false
-1
-Circle -7500403 true false 0 0 300
-Circle -2674135 true true 30 30 240
-Polygon -7500403 true false 195 75 90 75 150 150 90 225 195 225 195 210 195 195 180 210 120 210 165 150 120 90 180 90 195 105 195 75
-
 pentagon
 false
 0
@@ -854,7 +829,7 @@ Polygon -7500403 true true 270 75 225 30 30 225 75 270
 Polygon -7500403 true true 30 75 75 30 270 225 225 270
 
 @#$#@#$#@
-NetLogo 5.2.0
+NetLogo 5.2.1
 @#$#@#$#@
 @#$#@#$#@
 @#$#@#$#@
@@ -870,17 +845,6 @@ true
 0
 Line -7500403 true 150 150 90 180
 Line -7500403 true 150 150 210 180
-
-small-arrow-shape
-0.0
--0.2 0 0.0 1.0
-0.0 1 1.0 0.0
-0.2 0 0.0 1.0
-link direction
-true
-0
-Line -7500403 true 150 150 135 180
-Line -7500403 true 150 150 165 180
 
 @#$#@#$#@
 0
