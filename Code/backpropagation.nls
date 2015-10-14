@@ -1,13 +1,54 @@
+extensions [ table ]
+
 globals 
 [
+  global-table
+  
+  num-examples-per-epoch
   epoch-error
   stop-criteria-met
 ]
 
-to train
+to begin
+  
+  let dataset get-dataset
+  
+  train dataset
+  
+end
+
+to-report get-dataset 
+  
+  let dataset table:make
+  
+  ;; get data from somewhere (???)
+  
+  report dataset
+  
+end
+
+to train [ dataset ]
   
   set epoch-error 0
   set stop-criteria-met false
+  
+  let randomized-dataset ( shuffle table:to-list dataset )
+  
+  let epoch-dataset ( sublist randomized-dataset 0 num-examples-per-epoch )
+  
+  foreach epoch-dataset
+  [
+    let input-data ( item 0 ? )
+    let out-data ( item 1 ? )
+    
+    activate-inputs input-data
+    
+    propagate
+    
+    back-propagate
+  ]
+  
+  tick
   
 end
 
@@ -29,29 +70,44 @@ end
 
 to propagate
   
+  let chosen-function activation-function
+  
   foreach ( n-values num-hidden-layers [?] )
   [
     ask hidden-nodes with [ layer = ? ]
     [
-      set activation new-activation
+      set activation ( new-activation chosen-function )
     ]
   ]
   
   ask output-nodes 
   [
-    set activation new-activation
+    set activation ( new-activation chosen-function )
   ]
   
 end
 
-to-report new-activation
+to-report new-activation [ chosen-function ]
   
-  report ( sigmoid induced-local-field )
+  if ( chosen-function = "hyperbolic-tangent" )
+  [
+    report ( hyperbolic-tangent-function induced-local-field )
+  ] 
+  
+  report ( logistic-function induced-local-field )
   
 end
+
 
 to-report induced-local-field
   
   report sum [ [ activation ] of end1 * weight ] of my-in-links
+  
+end
+
+
+to back-propagate
+  
+  
   
 end
