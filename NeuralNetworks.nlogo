@@ -17,15 +17,15 @@ bias-nodes-own [
   added-to-layer?
 ]
 
-input-nodes-own [ activation err ]
+input-nodes-own [ activation ]
 
-output-nodes-own [ activation err ]
+output-nodes-own [ activation err local-gradient ]
 
 hidden-nodes-own [
 
   activation
-  err
   layer
+  local-gradient
 ]
 
 globals [

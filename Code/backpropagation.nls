@@ -9,7 +9,7 @@ globals
   stop-criteria-met
 ]
 
-to begin
+to begin-train
   
   let dataset get-dataset
   
@@ -45,8 +45,10 @@ to train [ dataset ]
     
     propagate
     
-    back-propagate
+    calc-output-nodes-error out-data
   ]
+  
+  set epoch-error sum [ err ^ 2 ] of output-nodes
   
   tick
   
@@ -105,6 +107,22 @@ to-report induced-local-field
   
 end
 
+
+to calc-output-nodes-error [ expected-out ] 
+  
+  let i 0
+  
+  foreach sort-on [ who ] output-nodes 
+  [
+    ask ? 
+    [
+      set err expected-out - ( item i expected-out )
+    ]
+    
+    set i ( i + 1 )
+  ]
+  
+end
 
 to back-propagate
   
