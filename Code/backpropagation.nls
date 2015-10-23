@@ -41,6 +41,9 @@ to train [ dataset ]
   
   foreach epoch-dataset
   [
+    ; pair of input-data and out-data is array
+    ; input-data -> array
+    ; out-data -> array
     let input-data ( item 0 ? )
     let out-data ( item 1 ? )
     

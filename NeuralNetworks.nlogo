@@ -282,10 +282,10 @@ NIL
 HORIZONTAL
 
 BUTTON
-386
-22
-505
-55
+475
+18
+594
+51
 Setup network
 setup
 NIL
@@ -314,10 +314,10 @@ NIL
 HORIZONTAL
 
 SLIDER
-278
-106
-469
-139
+189
+67
+380
+100
 num-nodes-per-hidden-layer
 num-nodes-per-hidden-layer
 1
@@ -353,7 +353,7 @@ nodes-per-hidden-layer
 INPUTBOX
 140
 196
-283
+279
 256
 hidden-layer-num-nodes
 -1
@@ -362,10 +362,10 @@ hidden-layer-num-nodes
 Number
 
 BUTTON
-292
-221
-459
-254
+289
+215
+456
+248
 Update hidden layer table
 if is-number? hidden-layer-seq and is-number? hidden-layer-num-nodes\nand hidden-layer-seq >= 1 and hidden-layer-seq <= 10\nand hidden-layer-num-nodes >= 1 and hidden-layer-num-nodes <= 30 \n[ \n update-layer hidden-layer-seq hidden-layer-num-nodes\n]
 NIL
@@ -397,10 +397,10 @@ OUTPUT
 13
 
 INPUTBOX
-21
-195
-133
-255
+18
+194
+130
+254
 hidden-layer-seq
 -1
 1
@@ -408,10 +408,10 @@ hidden-layer-seq
 Number
 
 BUTTON
-290
-151
-460
-184
+332
+109
+468
+142
 Remove link (mouse)
 remove-link-by-mouse
 T
@@ -425,10 +425,10 @@ NIL
 1
 
 BUTTON
-469
-221
-592
-254
+473
+215
+596
+248
 Clear selection
 clear-selection
 NIL
@@ -459,10 +459,10 @@ NIL
 1
 
 BUTTON
-493
-265
-598
-298
+364
+151
+469
+184
 Remove link
 remove-link
 NIL
