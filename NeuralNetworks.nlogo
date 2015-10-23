@@ -362,9 +362,9 @@ hidden-layer-num-nodes
 Number
 
 BUTTON
-288
+298
 195
-455
+465
 228
 Update hidden layer table
 if is-number? hidden-layer-seq and is-number? hidden-layer-num-nodes\nand hidden-layer-seq >= 1 and hidden-layer-seq <= 10\nand hidden-layer-num-nodes >= 1 and hidden-layer-num-nodes <= 30 \n[ \n update-layer hidden-layer-seq hidden-layer-num-nodes\n]
@@ -425,10 +425,10 @@ NIL
 1
 
 BUTTON
-346
-153
-469
-186
+343
+154
+466
+187
 Clear selection
 clear-selection
 NIL
@@ -593,10 +593,10 @@ NIL
 HORIZONTAL
 
 SLIDER
-416
-646
-588
-679
+414
+543
+586
+576
 learning-rate
 learning-rate
 0
@@ -608,10 +608,10 @@ NIL
 HORIZONTAL
 
 SLIDER
-418
-684
-590
-717
+416
+581
+588
+614
 momentum
 momentum
 -0.9
