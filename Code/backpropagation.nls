@@ -32,6 +32,9 @@ to train [ dataset ]
   set epoch-error 0
   set stop-criteria-met false
   
+  let af ifelse-value ( activation-function = "hyperbolic-tangent" ) [ task hyperbolic-tangent-function ] [ task logistic-function ]
+  let daf ifelse-value ( activation-function = "hyperbolic-tangent" ) [ task hyperbolic-tangent-function-derivative ] [ task logistic-function-derivative ] 
+  
   let randomized-dataset ( shuffle table:to-list dataset )
   
   let epoch-dataset ( sublist randomized-dataset 0 num-examples-per-epoch )
@@ -43,9 +46,11 @@ to train [ dataset ]
     
     activate-inputs input-data
     
-    propagate
+    propagate af
     
     calc-output-nodes-error out-data
+    
+    back-propagate daf
   ]
   
   set epoch-error sum [ err ^ 2 ] of output-nodes
@@ -70,36 +75,22 @@ to activate-inputs [ input-data ]
   
 end
 
-to propagate
-  
-  let chosen-function activation-function
+to propagate [ af ]
   
   foreach ( n-values num-hidden-layers [?] )
   [
     ask hidden-nodes with [ layer = ? ]
     [
-      set activation ( new-activation chosen-function )
+      set activation (runresult af induced-local-field)
     ]
   ]
   
   ask output-nodes 
   [
-    set activation ( new-activation chosen-function )
+    set activation (runresult af induced-local-field)
   ]
   
 end
-
-to-report new-activation [ chosen-function ]
-  
-  if ( chosen-function = "hyperbolic-tangent" )
-  [
-    report ( hyperbolic-tangent-function induced-local-field )
-  ] 
-  
-  report ( logistic-function induced-local-field )
-  
-end
-
 
 to-report induced-local-field
   
@@ -124,8 +115,25 @@ to calc-output-nodes-error [ expected-out ]
   
 end
 
-to back-propagate
+to back-propagate [ daf ]
   
+  ask output-nodes 
+  [
+    set local-gradient err * ( runresult daf activation )
+  ]
   
+  foreach ( reverse n-values num-hidden-layers [?] )
+  [
+    ask hidden-nodes with [ layer = ? ]
+    [
+      set local-gradient ( runresult daf activation ) * sum [weight * [local-gradient] of end2] of my-out-links
+    ]
+  ]
+  
+  ask links with [ link-type = connection-link-type ]
+  [
+    set velocity momentum * velocity + learning-rate * [ activation ] of end1 * [ local-gradient ] of end2
+    set weight weight + velocity
+  ]
   
 end

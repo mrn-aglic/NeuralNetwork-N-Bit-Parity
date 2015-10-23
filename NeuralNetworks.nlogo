@@ -2,7 +2,12 @@ __includes [ "code/utils.nls" "code/manipulationUtils.nls" "code/nn_positionNode
 
 extensions [ table ]
 
-links-own [ weight ]
+;; link-type -> remove if only create-links-to remains
+links-own [
+  weight
+  link-type
+  velocity
+]
 
 breed [ bias-nodes bias-node ]
 breed [ input-nodes input-node ]
@@ -34,6 +39,8 @@ globals [
   num-out-nodes
   nodes-per-hidden-layer
 
+  connection-link-type
+
   ;;;;;;;;
   ff-connections-color
 
@@ -52,6 +59,8 @@ to setup
   clear-all
 
   ask patches [ set pcolor 9.5 ]
+
+  set connection-link-type "connection-link"
 
   set-default-shape bias-nodes "bias-node"
   set-default-shape input-nodes "circle"
@@ -110,10 +119,12 @@ to full-connect-layers [ from _to ]
   [
     create-links-to _to
     [
+      set link-type connection-link-type
+      set velocity 0
       set weight ( runresult ( word w-random " " wrandom-mean " - " (wrandom-mean / 2) " " ifelse-value ( w-random = "random-normal" ) [ ( word std-deviation ) ] [ "" ] ) )
       set color ff-connections-color
     ]
-    create-links-from _to [ set hidden? true set color learning-connections-color ]
+    ;create-links-from _to [ set hidden? true set color learning-connections-color set link-type "learning-link" ]
   ]
 
 end
@@ -134,7 +145,7 @@ to full-connect-all-layers
 
     full-connect-layers ( turtle-set ( hidden-nodes with [ layer = num-hidden-layers - 1 ] ) ( bias-nodes with [ layer = num-hidden-layers - 1 ] ) ) ( output-nodes )
   ]
-
+  ;; Missing create links from output nodes to last hidden layer nodes
 
 end
 
@@ -577,6 +588,36 @@ bhyper-const
 4
 2
 0.1
+1
+NIL
+HORIZONTAL
+
+SLIDER
+416
+646
+588
+679
+learning-rate
+learning-rate
+0
+1.0
+0.5
+0.001
+1
+NIL
+HORIZONTAL
+
+SLIDER
+418
+684
+590
+717
+momentum
+momentum
+-0.9
+0.9
+0.2
+0.01
 1
 NIL
 HORIZONTAL
