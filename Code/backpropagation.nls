@@ -110,7 +110,7 @@ to calc-output-nodes-error [ expected-out ]
   [
     ask ? 
     [
-      set err expected-out - ( item i expected-out )
+      set err ( item i expected-out ) - activation
     ]
     
     set i ( i + 1 )
