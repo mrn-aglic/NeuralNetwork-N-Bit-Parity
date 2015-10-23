@@ -252,10 +252,10 @@ ticks
 30.0
 
 SLIDER
-25
-20
-203
-53
+147
+14
+325
+47
 num-input-nodes
 num-input-nodes
 2
@@ -267,10 +267,10 @@ NIL
 HORIZONTAL
 
 SLIDER
-208
-21
-369
-54
+330
+15
+491
+48
 num-output-nodes
 num-output-nodes
 1
@@ -282,10 +282,10 @@ NIL
 HORIZONTAL
 
 BUTTON
-475
-18
-594
-51
+21
+14
+140
+47
 Setup network
 setup
 NIL
@@ -299,10 +299,10 @@ NIL
 1
 
 SLIDER
-23
-64
-170
-97
+15
+62
+162
+95
 num-hidden-layers
 num-hidden-layers
 0
@@ -314,10 +314,10 @@ NIL
 HORIZONTAL
 
 SLIDER
-189
-67
-380
-100
+170
+63
+361
+96
 num-nodes-per-hidden-layer
 num-nodes-per-hidden-layer
 1
@@ -330,9 +330,9 @@ HORIZONTAL
 
 SWITCH
 20
-107
+109
 252
-140
+142
 auto-hidden-number-of-nodes?
 auto-hidden-number-of-nodes?
 1
@@ -340,9 +340,9 @@ auto-hidden-number-of-nodes?
 -1000
 
 MONITOR
-18
+12
 264
-486
+480
 309
 Nodes per hidden layer
 nodes-per-hidden-layer
@@ -362,10 +362,10 @@ hidden-layer-num-nodes
 Number
 
 BUTTON
-289
-215
-456
-248
+288
+195
+455
+228
 Update hidden layer table
 if is-number? hidden-layer-seq and is-number? hidden-layer-num-nodes\nand hidden-layer-seq >= 1 and hidden-layer-seq <= 10\nand hidden-layer-num-nodes >= 1 and hidden-layer-num-nodes <= 30 \n[ \n update-layer hidden-layer-seq hidden-layer-num-nodes\n]
 NIL
@@ -381,7 +381,7 @@ NIL
 SWITCH
 19
 152
-261
+208
 185
 uniform-hidden-layers?
 uniform-hidden-layers?
@@ -393,7 +393,7 @@ OUTPUT
 13
 316
 598
-628
+531
 13
 
 INPUTBOX
@@ -425,10 +425,10 @@ NIL
 1
 
 BUTTON
-473
-215
-596
-248
+346
+153
+469
+186
 Clear selection
 clear-selection
 NIL
@@ -459,10 +459,10 @@ NIL
 1
 
 BUTTON
-364
-151
-469
-184
+368
+63
+473
+96
 Remove link
 remove-link
 NIL
@@ -621,6 +621,24 @@ momentum
 1
 NIL
 HORIZONTAL
+
+PLOT
+13
+545
+405
+728
+Error vs Epochs
+NIL
+NIL
+0.0
+10.0
+0.0
+1.0
+true
+false
+"" ""
+PENS
+"default" 1.0 0 -16777216 true "" "plot epoch-error"
 
 @#$#@#$#@
 ## WHAT IS IT?
