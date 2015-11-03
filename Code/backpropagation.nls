@@ -4,7 +4,6 @@ globals
 [
   global-table
   
-  num-examples-per-epoch
   epoch-error
   stop-criteria-met
 ]
@@ -19,23 +18,39 @@ end
 
 to-report get-dataset 
   
-  let dataset table:make
-  
   ;; get data from somewhere (???)
+  let dataset ifelse-value ( data-source = "procedure" ) [ ask-procedure-name ] [ get-dataset-from-file ]
   
   report dataset
   
 end
 
+to-report ask-procedure-name
+  
+  let procedure-name user-input "Enter procedure name "
+  
+  report runresult procedure-name
+  
+end
+
+to-report get-dataset-from-file
+
+  ;; TO DO: Implement
+  report ( list )
+
+end
+
 to train [ dataset ]
   
-  set epoch-error 0
+  set epoch-error -1
   set stop-criteria-met false
   
   let af ifelse-value ( activation-function = "hyperbolic-tangent" ) [ task hyperbolic-tangent-function ] [ task logistic-function ]
   let daf ifelse-value ( activation-function = "hyperbolic-tangent" ) [ task hyperbolic-tangent-function-derivative ] [ task logistic-function-derivative ] 
   
-  let randomized-dataset ( shuffle table:to-list dataset )
+  if ( epoch-error > -1 and epoch-error < 0.05 ) [ stop ]
+  
+  let randomized-dataset ( shuffle dataset ) ;; ( ifelse-value ( is-list? dataset ) [ dataset ] [ table:to-list dataset ] ) )
   
   let epoch-dataset ( sublist randomized-dataset 0 num-examples-per-epoch )
   

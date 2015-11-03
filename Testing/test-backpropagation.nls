@@ -1,0 +1,117 @@
+globals
+[
+  old-num-input-nodes
+  old-uniform-hidden-layers?
+  old-num-hidden-layers
+  old-num-nodes-per-hidden-layer
+  old-num-output-nodes
+]
+
+to test-backpropagation
+  
+  let dataset ( floor generate-test-dataset num-examples-per-epoch / 0.75 )
+  
+  train dataset
+  
+end
+
+to setup-new-values
+  
+  store-old-values
+  
+  set num-input-nodes 2
+  
+  set uniform-hidden-layers? true
+  
+  set num-hidden-layers 1
+  set num-nodes-per-hidden-layer 2
+  set num-output-nodes 1
+  
+  startup
+  
+end
+
+to store-old-values
+  
+  set old-num-input-nodes            num-input-nodes
+  set old-uniform-hidden-layers?     uniform-hidden-layers?
+  set old-num-hidden-layers          num-hidden-layers
+  set old-num-nodes-per-hidden-layer num-nodes-per-hidden-layer
+  set old-num-output-nodes           num-output-nodes
+  
+end
+
+to restore-old-values
+  
+  set num-input-nodes            old-num-input-nodes
+  set uniform-hidden-layers?     old-uniform-hidden-layers?
+  set num-hidden-layers          old-num-hidden-layers
+  set num-nodes-per-hidden-layer old-num-nodes-per-hidden-layer
+  set num-output-nodes           old-num-output-nodes
+  
+end
+
+to-report target-answer
+  
+  let a [ activation ] of min-one-of input-nodes [ who ] = 1
+  let b [ activation ] of max-one-of input-nodes [ who ] = 1
+  
+  report ifelse-value runresult ( word "a " target-function " b" ) [ 1 ][ 0 ] 
+  
+end
+
+to-report _generate-test-dataset
+  
+  report generate-test-dataset floor ( num-examples-per-epoch / 0.75 )
+  
+end
+
+to-report generate-test-dataset [ _count ]
+  
+  report n-values _count [ generate-dataset-pair ]
+
+end
+
+;; a dataset pair is an input vector x with a target vector y
+;; the input vector x consists of elements fed into the input neurons and thus has to have the
+;; same dimension as the number of input neurons
+;; the target vector y has a dimension equal to the number of output neurons
+to-report generate-dataset-pair
+  
+  let a random 2
+  let b random 2
+  
+  let c ifelse-value runresult ( word "a = 1 " target-function " b = 1" ) [ 1 ] [ 0 ]
+  
+  let input-vector (list a b)
+  let target-vector (list c)
+ 
+  report ( list input-vector target-vector )
+  
+end
+
+to test [ in1 in2 ]
+  
+  let result get-result-for-user-test-input in1 in2
+  let correct? ifelse-value ( result = target-answer ) [ "correct" ] [ "incorrect" ]
+  
+  user-message (word
+    "The expected answer for " in1 " " target-function " " in2 " is " target-answer ".\n\n"
+    "The network reported " result ", which is " correct? ".")
+  
+end
+
+to-report get-result-for-user-test-input [ in1 in2 ]
+
+  ask min-one-of input-nodes [who] [ set activation in1 ]
+  ask max-one-of input-nodes [who] [ set activation in2 ]
+  
+  let af ifelse-value ( activation-function = "hyperbolic-tangent" ) [ task hyperbolic-tangent-function ] [ task logistic-function ]
+  
+  propagate af
+  
+  let threshold 0.5
+  
+  report step ( [activation] of one-of output-nodes ) threshold
+
+end

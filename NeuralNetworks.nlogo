@@ -1,4 +1,7 @@
-__includes [ "code/utils.nls" "code/manipulationUtils.nls" "code/nn_positionNodes.nls" "code/backpropagation.nls" "code/learningutils.nls" ]
+__includes [
+  "code/utils.nls" "code/manipulationUtils.nls" "code/nn_positionNodes.nls" "code/backpropagation.nls" "code/learningutils.nls"
+  "testing/test-backpropagation.nls"
+  ]
 
 extensions [ table ]
 
@@ -498,10 +501,10 @@ selected-second
 11
 
 SLIDER
-605
-648
-777
-681
+745
+645
+917
+678
 sigmoid-param-a
 sigmoid-param-a
 1
@@ -513,10 +516,10 @@ NIL
 HORIZONTAL
 
 SLIDER
-974
-647
-1117
-680
+1110
+644
+1253
+677
 wrandom-mean
 wrandom-mean
 0.1
@@ -528,20 +531,20 @@ NIL
 HORIZONTAL
 
 CHOOSER
-788
-644
-965
-689
+924
+645
+1101
+690
 w-random
 w-random
 "random-float" "random-normal" "random-poisson" "random-exponential"
 0
 
 SLIDER
-1125
-647
-1267
-680
+1259
+644
+1401
+677
 std-deviation
 std-deviation
 0.1
@@ -553,19 +556,19 @@ NIL
 HORIZONTAL
 
 CHOOSER
-601
-685
-770
-730
+930
+696
+1099
+741
 activation-function
 activation-function
 "logistic" "hyperbolic-tangent"
 0
 
 SLIDER
-784
+1122
 695
-956
+1256
 728
 ahyper-const
 ahyper-const
@@ -578,10 +581,10 @@ NIL
 HORIZONTAL
 
 SLIDER
-965
-693
-1137
-726
+1273
+694
+1403
+727
 bhyper-const
 bhyper-const
 0.1
@@ -593,10 +596,10 @@ NIL
 HORIZONTAL
 
 SLIDER
-414
-543
-586
-576
+382
+600
+554
+633
 learning-rate
 learning-rate
 0
@@ -608,10 +611,10 @@ NIL
 HORIZONTAL
 
 SLIDER
-416
-581
-588
-614
+384
+642
+556
+675
 momentum
 momentum
 -0.9
@@ -625,7 +628,7 @@ HORIZONTAL
 PLOT
 13
 545
-405
+371
 728
 Error vs Epochs
 NIL
@@ -639,6 +642,58 @@ false
 "" ""
 PENS
 "default" 1.0 0 -16777216 true "" "plot epoch-error"
+
+BUTTON
+562
+655
+699
+688
+Test backprop with
+test-backpropagation
+T
+1
+T
+OBSERVER
+NIL
+NIL
+NIL
+NIL
+1
+
+CHOOSER
+562
+698
+700
+743
+target-function
+target-function
+"or" "xor"
+0
+
+SLIDER
+705
+703
+930
+736
+num-examples-per-epoch
+num-examples-per-epoch
+1
+1000
+500
+1
+1
+NIL
+HORIZONTAL
+
+CHOOSER
+405
+544
+543
+589
+data-source
+data-source
+"file" "procedure"
+1
 
 @#$#@#$#@
 ## WHAT IS IT?

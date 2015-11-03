@@ -27,3 +27,9 @@ to-report hyperbolic-tangent-function-derivative [ input ]
   report ( ahyper-const / bhyper-const ) * ( ahyper-const - input ) * ( bhyper-const + input )
 
 end
+
+to-report step [ input threshold ]
+  
+  report ifelse-value ( input <= threshold ) [ 0 ] [ 1 ]
+  
+end
