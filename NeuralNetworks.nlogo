@@ -671,10 +671,10 @@ target-function
 0
 
 SLIDER
-705
 703
-930
-736
+686
+928
+719
 num-examples-per-epoch
 num-examples-per-epoch
 1

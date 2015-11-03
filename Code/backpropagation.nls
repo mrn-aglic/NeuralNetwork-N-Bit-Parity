@@ -48,8 +48,6 @@ to train [ dataset ]
   let af ifelse-value ( activation-function = "hyperbolic-tangent" ) [ task hyperbolic-tangent-function ] [ task logistic-function ]
   let daf ifelse-value ( activation-function = "hyperbolic-tangent" ) [ task hyperbolic-tangent-function-derivative ] [ task logistic-function-derivative ] 
   
-  if ( epoch-error > -1 and epoch-error < 0.05 ) [ stop ]
-  
   let randomized-dataset ( shuffle dataset ) ;; ( ifelse-value ( is-list? dataset ) [ dataset ] [ table:to-list dataset ] ) )
   
   let epoch-dataset ( sublist randomized-dataset 0 num-examples-per-epoch )
