@@ -1,0 +1,14 @@
+to-report cross-validation [ dataset ]
+  
+  let num-examples length dataset
+  let randomized shuffle dataset
+  
+  let training-set-size floor ( num-examples * 0.75 )
+  let validation-set-size ( num-examples - training-set-size ) * 0.5
+  
+  let training-set sublist 0 randomized ( floor ( num-examples * 0.75 ) )
+  
+  
+  report []
+  
+end
