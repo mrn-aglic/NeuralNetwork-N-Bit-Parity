@@ -1,6 +1,6 @@
 to-report logistic-function [ input ]
   
-  report 1 / ( 1 + e ^ ( - input * sigmoid-param-a ) )
+  report 1 / ( 1 + e ^ ( - input * logistic-param-a ) )
   
 end 
 
@@ -18,7 +18,7 @@ end
 
 to-report logistic-function-derivative [ input ]
   
-  report sigmoid-param-a * input * ( 1 - input )
+  report logistic-param-a * input * ( 1 - input )
   
 end
 

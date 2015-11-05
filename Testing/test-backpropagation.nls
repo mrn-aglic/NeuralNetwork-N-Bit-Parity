@@ -9,9 +9,11 @@ globals
 
 to test-backpropagation
   
-  let dataset ( floor generate-test-dataset num-examples-per-epoch / 0.75 )
+  let num-examples-predefined 1000
   
-  train dataset
+  set dataset generate-test-dataset num-examples-predefined 
+  
+  begin-train
   
 end
 
@@ -60,12 +62,6 @@ to-report target-answer
   
 end
 
-to-report _generate-test-dataset
-  
-  report generate-test-dataset floor ( num-examples-per-epoch / 0.75 )
-  
-end
-
 to-report generate-test-dataset [ _count ]
   
   report n-values _count [ generate-dataset-pair ]
@@ -90,7 +86,7 @@ to-report generate-dataset-pair
   
 end
 
-to test [ in1 in2 ]
+to user-entered-test [ in1 in2 ]
   
   let result get-result-for-user-test-input in1 in2
   let correct? ifelse-value ( result = target-answer ) [ "correct" ] [ "incorrect" ]

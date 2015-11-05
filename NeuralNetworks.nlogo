@@ -1,5 +1,5 @@
 __includes [
-  "code/utils.nls" "code/manipulationUtils.nls" "code/nn_positionNodes.nls" "code/backpropagation.nls" "code/learningutils.nls"
+  "code/utils.nls" "code/manipulationUtils.nls" "code/nn_positionNodes.nls" "code/backpropagation.nls" "code/learningutils.nls" "code/cross_validation.nls"
   "testing/test-backpropagation.nls"
   ]
 
@@ -392,13 +392,6 @@ uniform-hidden-layers?
 1
 -1000
 
-OUTPUT
-13
-316
-598
-531
-13
-
 INPUTBOX
 18
 194
@@ -501,12 +494,12 @@ selected-second
 11
 
 SLIDER
-745
-645
-917
-678
-sigmoid-param-a
-sigmoid-param-a
+425
+454
+597
+487
+logistic-param-a
+logistic-param-a
 1
 25
 1
@@ -516,10 +509,10 @@ NIL
 HORIZONTAL
 
 SLIDER
-1110
-644
-1253
-677
+448
+315
+597
+348
 wrandom-mean
 wrandom-mean
 0.1
@@ -531,20 +524,20 @@ NIL
 HORIZONTAL
 
 CHOOSER
-924
-645
-1101
-690
+316
+316
+440
+361
 w-random
 w-random
 "random-float" "random-normal" "random-poisson" "random-exponential"
 0
 
 SLIDER
-1259
-644
-1401
-677
+446
+351
+598
+384
 std-deviation
 std-deviation
 0.1
@@ -556,20 +549,20 @@ NIL
 HORIZONTAL
 
 CHOOSER
-930
-696
-1099
-741
+431
+405
+600
+450
 activation-function
 activation-function
 "logistic" "hyperbolic-tangent"
 0
 
 SLIDER
-1122
-695
-1256
-728
+462
+494
+596
+527
 ahyper-const
 ahyper-const
 0.1
@@ -581,10 +574,10 @@ NIL
 HORIZONTAL
 
 SLIDER
-1273
-694
-1403
-727
+467
+535
+597
+568
 bhyper-const
 bhyper-const
 0.1
@@ -596,10 +589,10 @@ NIL
 HORIZONTAL
 
 SLIDER
-382
-600
-554
-633
+154
+322
+303
+355
 learning-rate
 learning-rate
 0
@@ -611,10 +604,10 @@ NIL
 HORIZONTAL
 
 SLIDER
-384
-642
-556
-675
+156
+364
+300
+397
 momentum
 momentum
 -0.9
@@ -626,10 +619,10 @@ NIL
 HORIZONTAL
 
 PLOT
-13
-545
-371
-728
+10
+409
+418
+592
 Error vs Epochs
 NIL
 NIL
@@ -644,10 +637,10 @@ PENS
 "default" 1.0 0 -16777216 true "" "plot epoch-error"
 
 BUTTON
-562
-655
-699
-688
+607
+646
+744
+679
 Test backprop with
 test-backpropagation
 T
@@ -661,38 +654,40 @@ NIL
 1
 
 CHOOSER
-562
-698
-700
-743
+756
+643
+894
+688
 target-function
 target-function
 "or" "xor"
 0
 
-SLIDER
-703
-686
-928
-719
-num-examples-per-epoch
-num-examples-per-epoch
-1
-1000
-500
-1
-1
-NIL
-HORIZONTAL
-
 CHOOSER
-405
-544
-543
-589
+8
+359
+146
+404
 data-source
 data-source
 "file" "procedure"
+1
+
+BUTTON
+15
+321
+134
+354
+Load data
+get-dataset
+NIL
+1
+T
+OBSERVER
+NIL
+NIL
+NIL
+NIL
 1
 
 @#$#@#$#@

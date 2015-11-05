@@ -4,24 +4,17 @@ globals
 [
   global-table
   
+  dataset
   epoch-error
+  validation-error
+  test-error
   stop-criteria-met
 ]
 
-to begin-train
-  
-  let dataset get-dataset
-  
-  train dataset
-  
-end
-
-to-report get-dataset 
+to get-dataset 
   
   ;; get data from somewhere (???)
-  let dataset ifelse-value ( data-source = "procedure" ) [ ask-procedure-name ] [ get-dataset-from-file ]
-  
-  report dataset
+  set dataset ifelse-value ( data-source = "procedure" ) [ ask-procedure-name ] [ get-dataset-from-file ]
   
 end
 
@@ -40,19 +33,68 @@ to-report get-dataset-from-file
 
 end
 
-to train [ dataset ]
-  
-  set epoch-error -1
-  set stop-criteria-met false
+to begin-train
   
   let af ifelse-value ( activation-function = "hyperbolic-tangent" ) [ task hyperbolic-tangent-function ] [ task logistic-function ]
   let daf ifelse-value ( activation-function = "hyperbolic-tangent" ) [ task hyperbolic-tangent-function-derivative ] [ task logistic-function-derivative ] 
   
-  let randomized-dataset ( shuffle dataset ) ;; ( ifelse-value ( is-list? dataset ) [ dataset ] [ table:to-list dataset ] ) )
+  let cross-validation-datasets ( split-for-cross-validation dataset )
   
-  let epoch-dataset ( sublist randomized-dataset 0 num-examples-per-epoch )
+  let training-set item 0 cross-validation-datasets
+  let validation-set item 1 cross-validation-datasets
+  let test-set item 2 cross-validation-datasets
   
-  foreach epoch-dataset
+  train training-set af daf
+  
+  validate validation-set af
+  
+  test test-set af
+  
+  tick
+  
+end
+
+to validate [ validation-set af ]
+  
+  foreach validation-set 
+  [
+    let input-data ( item 0 ? )
+    let out-data ( item 1 ? )
+    
+    activate-inputs input-data
+    
+    propagate af
+    
+    calc-output-nodes-error out-data
+  ]
+  
+  set validation-error sum [ err ^ 2 ] of output-nodes
+  
+end
+
+to test [ test-set af ]
+  
+  foreach test-set 
+  [
+    let input-data ( item 0 ? )
+    let out-data ( item 1 ? )
+    
+    activate-inputs input-data
+    
+    propagate af
+    
+    calc-output-nodes-error out-data
+  ]
+  
+  set test-error sum [ err ^ 2 ] of output-nodes
+  
+end
+
+to train [ training-set af daf ]
+  
+  set epoch-error -1
+  
+  foreach training-set 
   [
     ; pair of input-data and out-data is array
     ; input-data -> array
@@ -71,7 +113,30 @@ to train [ dataset ]
   
   set epoch-error sum [ err ^ 2 ] of output-nodes
   
-  tick
+;  let randomized-dataset ( shuffle dataset ) ;; ( ifelse-value ( is-list? dataset ) [ dataset ] [ table:to-list dataset ] ) )
+;  
+;  let epoch-dataset ( sublist randomized-dataset 0 num-examples-predefined ) ;num-examples-per-epoch )
+;  
+;  foreach epoch-dataset
+;  [
+;    ; pair of input-data and out-data is array
+;    ; input-data -> array
+;    ; out-data -> array
+;    let input-data ( item 0 ? )
+;    let out-data ( item 1 ? )
+;    
+;    activate-inputs input-data
+;    
+;    propagate af
+;    
+;    calc-output-nodes-error out-data
+;    
+;    back-propagate daf
+;  ]
+;  
+;  set epoch-error sum [ err ^ 2 ] of output-nodes
+;  
+;  tick
   
 end
 
