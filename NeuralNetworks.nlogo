@@ -127,6 +127,7 @@ to full-connect-layers [ from _to ]
       set link-type connection-link-type
       set velocity 0
       set weight ( runresult ( word w-random " " wrandom-mean " - " (wrandom-mean / 2) " " ifelse-value ( w-random = "random-normal" ) [ ( word std-deviation ) ] [ "" ] ) )
+      set label-color black
       set color ff-connections-color
     ]
     ;create-links-from _to [ set hidden? true set color learning-connections-color set link-type "learning-link" ]
@@ -641,10 +642,10 @@ PENS
 "test-error" 1.0 0 -2674135 true "" "plot test-error"
 
 BUTTON
-607
-646
-744
-679
+610
+680
+747
+713
 Test backprop with
 test-backpropagation
 T
@@ -684,6 +685,71 @@ BUTTON
 354
 Load data
 get-dataset
+NIL
+1
+T
+OBSERVER
+NIL
+NIL
+NIL
+NIL
+1
+
+BUTTON
+629
+642
+722
+675
+Setup test
+testing-setup
+NIL
+1
+T
+OBSERVER
+NIL
+NIL
+NIL
+NIL
+1
+
+SWITCH
+210
+151
+338
+184
+show-weights?
+show-weights?
+0
+1
+-1000
+
+CHOOSER
+900
+643
+1038
+688
+input-1
+input-1
+0 1
+1
+
+CHOOSER
+1048
+642
+1186
+687
+input-2
+input-2
+0 1
+0
+
+BUTTON
+1197
+649
+1260
+682
+Test
+user-entered-test input-1 input-2
 NIL
 1
 T

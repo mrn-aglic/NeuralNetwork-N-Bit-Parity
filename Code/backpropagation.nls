@@ -50,6 +50,8 @@ to begin-train
   
   test test-set af
   
+  recolor
+  
   tick
   
 end
