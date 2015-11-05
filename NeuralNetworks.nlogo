@@ -61,6 +61,8 @@ to setup
   file-close-all
   clear-all
 
+  reset-ticks
+
   ask patches [ set pcolor 9.5 ]
 
   set connection-link-type "connection-link"
@@ -263,7 +265,7 @@ num-input-nodes
 num-input-nodes
 2
 20
-5
+2
 1
 1
 NIL
@@ -278,7 +280,7 @@ num-output-nodes
 num-output-nodes
 1
 20
-3
+1
 1
 1
 NIL
@@ -310,7 +312,7 @@ num-hidden-layers
 num-hidden-layers
 0
 10
-3
+1
 1
 1
 NIL
@@ -325,7 +327,7 @@ num-nodes-per-hidden-layer
 num-nodes-per-hidden-layer
 1
 30
-7
+2
 1
 1
 NIL
@@ -634,7 +636,9 @@ true
 false
 "" ""
 PENS
-"default" 1.0 0 -16777216 true "" "plot epoch-error"
+"epoch-error" 1.0 0 -11221820 true "" "plot epoch-error"
+"validation-error" 1.0 0 -13840069 true "" "plot validation-error"
+"test-error" 1.0 0 -2674135 true "" "plot test-error"
 
 BUTTON
 607
@@ -661,7 +665,7 @@ CHOOSER
 target-function
 target-function
 "or" "xor"
-0
+1
 
 CHOOSER
 8

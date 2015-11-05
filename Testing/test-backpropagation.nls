@@ -17,6 +17,16 @@ to test-backpropagation
   
 end
 
+to testing-setup
+  
+  clear-plot
+  
+  store-old-values
+  
+  setup-new-values
+  
+end
+
 to setup-new-values
   
   store-old-values
