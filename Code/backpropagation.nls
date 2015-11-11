@@ -115,7 +115,13 @@ to train [ training-set af daf ]
     
     calc-output-nodes-error out-data
     
-    back-propagate daf
+    ifelse ( backprop-implementation = "back-propagate" )
+    [
+      back-propagate daf
+    ]
+    [
+      back-propagate-haykin daf
+    ]
   ]
   
   set epoch-error sum [ err ^ 2 ] of output-nodes
@@ -144,13 +150,15 @@ to propagate [ af ]
   [
     ask hidden-nodes with [ layer = ? ]
     [
-      set activation (runresult af induced-local-field)
+      set local-field induced-local-field
+      set activation ( runresult af local-field )
     ]
   ]
   
   ask output-nodes 
   [
-    set activation (runresult af induced-local-field)
+    set local-field induced-local-field
+    set activation ( runresult af local-field )
   ]
   
 end
@@ -189,7 +197,7 @@ to back-propagate [ daf ]
   [
     ask hidden-nodes with [ layer = ? ]
     [
-      set local-gradient ( runresult daf activation ) * sum [weight * [local-gradient] of end2] of my-out-links
+      set local-gradient ( runresult daf activation ) * sum [ weight * [local-gradient] of end2 ] of my-out-links
     ]
   ]
   
@@ -197,6 +205,36 @@ to back-propagate [ daf ]
   [
     set velocity momentum * velocity + learning-rate * [ activation ] of end1 * [ local-gradient ] of end2
     set weight weight + velocity
+  ]
+  
+end
+
+
+to back-propagate-haykin [ daf ]
+  
+  ask output-nodes 
+  [
+    set local-gradient err * ( runresult daf activation )
+    
+    ask my-in-links
+    [
+      set velocity ( momentum * velocity + learning-rate * [ activation ] of end1 * [ local-gradient ] of end2 )
+      set weight weight + velocity
+    ]
+  ]
+  
+  foreach ( reverse n-values num-hidden-layers [?] )
+  [
+    ask hidden-nodes with [ layer = ? ]
+    [
+      set local-gradient ( runresult daf activation ) * sum [ weight * [ local-gradient ] of end2 ] of my-out-links
+      
+      ask my-in-links
+      [
+        set velocity ( momentum * velocity + learning-rate * [ activation ] of end1 * [ local-gradient ] of end2 )
+        set weight weight + velocity
+      ]
+    ]
   ]
   
 end

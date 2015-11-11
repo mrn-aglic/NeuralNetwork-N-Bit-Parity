@@ -26,10 +26,11 @@ bias-nodes-own [
 
 input-nodes-own [ activation ]
 
-output-nodes-own [ activation err local-gradient ]
+output-nodes-own [ activation local-field err local-gradient ]
 
 hidden-nodes-own [
 
+  local-field
   activation
   layer
   local-gradient
@@ -568,7 +569,7 @@ ahyper-const
 ahyper-const
 0.1
 4
-4
+3.5
 0.1
 1
 NIL
@@ -632,7 +633,7 @@ NIL
 0.0
 1.0
 true
-false
+true
 "" ""
 PENS
 "epoch-error" 1.0 0 -11221820 true "" "plot epoch-error"
@@ -729,7 +730,7 @@ CHOOSER
 input-1
 input-1
 0 1
-1
+0
 
 CHOOSER
 1048
@@ -756,6 +757,16 @@ NIL
 NIL
 NIL
 NIL
+1
+
+CHOOSER
+8
+604
+305
+649
+backprop-implementation
+backprop-implementation
+"back-propagate" "back-propagate (update weights layer-by-layer)"
 1
 
 @#$#@#$#@
