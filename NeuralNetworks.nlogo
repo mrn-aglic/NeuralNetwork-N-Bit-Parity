@@ -19,7 +19,6 @@ breed [ hidden-nodes hidden-node ]
 
 bias-nodes-own [
   activation
-  err
   input-bias?
   layer
   added-to-layer?
@@ -58,7 +57,6 @@ end
 
 to setup
 
-  file-close-all
   clear-all
 
   reset-ticks
@@ -558,7 +556,7 @@ CHOOSER
 450
 activation-function
 activation-function
-"logistic" "hyperbolic-tangent"
+"logistic" "hyperbolic-tangent" "softsign"
 0
 
 SLIDER

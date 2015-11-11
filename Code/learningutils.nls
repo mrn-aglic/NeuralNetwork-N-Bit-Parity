@@ -10,9 +10,9 @@ to-report hyperbolic-tangent-function [ input ]
 
 end
 
-to-report tanh [ x ]
+to-report softsign-function [ input ]
   
-  report ( e ^ ( 2 * x ) - 1 ) / ( e ^ ( 2 * x ) + 1 )
+  report input / ( 1 + abs input  ) 
   
 end
 
@@ -28,8 +28,34 @@ to-report hyperbolic-tangent-function-derivative [ input ]
 
 end
 
+to-report softsign-function-derivative [ input ]
+  
+  report 1 / ( ( 1 + abs input ) ^ 2 )
+  
+end
+
 to-report step [ input threshold ]
   
   report ifelse-value ( input <= threshold ) [ 0 ] [ 1 ]
+  
+end
+
+to-report sign [ input threshold ]  
+
+  ifelse input > threshold
+  [ report 1 ]
+  [ report -1 ]
+
+end
+
+to-report identity [ x ]
+  
+  report x
+  
+end
+
+to-report tanh [ x ]
+  
+  report ( e ^ ( 2 * x ) - 1 ) / ( e ^ ( 2 * x ) + 1 )
   
 end

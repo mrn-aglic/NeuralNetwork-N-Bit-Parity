@@ -35,8 +35,13 @@ end
 
 to begin-train
   
-  let af ifelse-value ( activation-function = "hyperbolic-tangent" ) [ task hyperbolic-tangent-function ] [ task logistic-function ]
-  let daf ifelse-value ( activation-function = "hyperbolic-tangent" ) [ task hyperbolic-tangent-function-derivative ] [ task logistic-function-derivative ] 
+  let af ifelse-value ( activation-function = "softsing" ) 
+            [ task softsign-function ] 
+            [ ifelse-value ( activation-function = "hyperbolic-tangent" )  [ task hyperbolic-tangent-function ] [ task logistic-function ] ]
+  
+  let daf ifelse-value ( activation-function = "softsing" ) 
+             [ task softsign-function-derivative ] 
+             [ ifelse-value ( activation-function = "hyperbolic-tangent" ) [ task hyperbolic-tangent-function-derivative ] [ task logistic-function-derivative ] ]
   
   let cross-validation-datasets ( split-for-cross-validation dataset )
   
@@ -114,31 +119,6 @@ to train [ training-set af daf ]
   ]
   
   set epoch-error sum [ err ^ 2 ] of output-nodes
-  
-;  let randomized-dataset ( shuffle dataset ) ;; ( ifelse-value ( is-list? dataset ) [ dataset ] [ table:to-list dataset ] ) )
-;  
-;  let epoch-dataset ( sublist randomized-dataset 0 num-examples-predefined ) ;num-examples-per-epoch )
-;  
-;  foreach epoch-dataset
-;  [
-;    ; pair of input-data and out-data is array
-;    ; input-data -> array
-;    ; out-data -> array
-;    let input-data ( item 0 ? )
-;    let out-data ( item 1 ? )
-;    
-;    activate-inputs input-data
-;    
-;    propagate af
-;    
-;    calc-output-nodes-error out-data
-;    
-;    back-propagate daf
-;  ]
-;  
-;  set epoch-error sum [ err ^ 2 ] of output-nodes
-;  
-;  tick
   
 end
 

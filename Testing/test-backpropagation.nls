@@ -112,7 +112,9 @@ to-report get-result-for-user-test-input [ in1 in2 ]
   ask min-one-of input-nodes [who] [ set activation in1 ]
   ask max-one-of input-nodes [who] [ set activation in2 ]
   
-  let af ifelse-value ( activation-function = "hyperbolic-tangent" ) [ task hyperbolic-tangent-function ] [ task logistic-function ]
+  let af ifelse-value ( activation-function = "softsing" ) 
+            [ task softsign-function ]
+            [ ifelse-value ( activation-function = "hyperbolic-tangent" ) [ task hyperbolic-tangent-function ] [ task logistic-function ] ]
   
   propagate af
   
