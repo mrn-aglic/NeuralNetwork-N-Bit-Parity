@@ -6,7 +6,7 @@ end
 
 to-report hyperbolic-tangent-function [ input ]
 
-  report ahyper-const * ( tanh bhyper-const * input )
+  report ahyper-const * ( tanh ( bhyper-const * input ) )
 
 end
 
@@ -24,7 +24,7 @@ end
 
 to-report hyperbolic-tangent-function-derivative [ input ]
 
-  report ( ahyper-const / bhyper-const ) * ( ahyper-const - input ) * ( bhyper-const + input )
+  report ( bhyper-const / ahyper-const ) * ( ahyper-const - input ) * ( ahyper-const + input )
 
 end
 

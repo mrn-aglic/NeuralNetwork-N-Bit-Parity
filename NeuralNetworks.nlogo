@@ -558,7 +558,7 @@ CHOOSER
 activation-function
 activation-function
 "logistic" "hyperbolic-tangent" "softsign"
-0
+1
 
 SLIDER
 462
@@ -569,14 +569,14 @@ ahyper-const
 ahyper-const
 0.1
 4
-3.5
+1
 0.1
 1
 NIL
 HORIZONTAL
 
 SLIDER
-467
+461
 535
 597
 568
@@ -584,7 +584,7 @@ bhyper-const
 bhyper-const
 0.1
 4
-2
+1
 0.1
 1
 NIL
@@ -641,10 +641,10 @@ PENS
 "test-error" 1.0 0 -2674135 true "" "plot test-error"
 
 BUTTON
-610
-680
-747
-713
+612
+651
+749
+684
 Test backprop with
 test-backpropagation
 T
@@ -684,23 +684,6 @@ BUTTON
 354
 Load data
 get-dataset
-NIL
-1
-T
-OBSERVER
-NIL
-NIL
-NIL
-NIL
-1
-
-BUTTON
-629
-642
-722
-675
-Setup test
-testing-setup
 NIL
 1
 T
@@ -767,7 +750,7 @@ CHOOSER
 backprop-implementation
 backprop-implementation
 "back-propagate" "back-propagate (update weights layer-by-layer)"
-1
+0
 
 @#$#@#$#@
 ## WHAT IS IT?

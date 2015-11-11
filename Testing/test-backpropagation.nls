@@ -17,51 +17,6 @@ to test-backpropagation
   
 end
 
-to testing-setup
-  
-  clear-plot
-  
-  store-old-values
-  
-  setup-new-values
-  
-end
-
-to setup-new-values
-  
-  store-old-values
-  
-  set num-input-nodes 2
-  
-  set uniform-hidden-layers? true
-  
-  set num-hidden-layers 1
-  set num-nodes-per-hidden-layer 2
-  set num-output-nodes 1
-  
-  startup
-  
-end
-
-to store-old-values
-  
-  set old-num-input-nodes            num-input-nodes
-  set old-uniform-hidden-layers?     uniform-hidden-layers?
-  set old-num-hidden-layers          num-hidden-layers
-  set old-num-nodes-per-hidden-layer num-nodes-per-hidden-layer
-  set old-num-output-nodes           num-output-nodes
-  
-end
-
-to restore-old-values
-  
-  set num-input-nodes            old-num-input-nodes
-  set uniform-hidden-layers?     old-uniform-hidden-layers?
-  set num-hidden-layers          old-num-hidden-layers
-  set num-nodes-per-hidden-layer old-num-nodes-per-hidden-layer
-  set num-output-nodes           old-num-output-nodes
-  
-end
 
 to-report target-answer
   
