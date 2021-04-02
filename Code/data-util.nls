@@ -1,0 +1,29 @@
+globals [ dataset ]
+
+to-report report-dataset
+  
+  report ifelse-value ( data-source = "procedure" ) [ ask-procedure-name ] [ get-dataset-from-file ]
+  
+end
+
+to set-dataset 
+  
+  ;; get data from somewhere (???)
+  set dataset ifelse-value ( data-source = "procedure" ) [ ask-procedure-name ] [ get-dataset-from-file ]
+  
+end
+
+to-report ask-procedure-name
+  
+  let procedure-name user-input "Enter procedure name "
+  
+  report runresult procedure-name
+  
+end
+
+to-report get-dataset-from-file
+
+  ;; TO DO: Implement
+  report ( list )
+
+end

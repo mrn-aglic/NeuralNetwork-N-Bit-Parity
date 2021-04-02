@@ -2,58 +2,32 @@ extensions [ table ]
 
 globals 
 [
-  global-table
-  
-  dataset
   epoch-error
   validation-error
   test-error
   stop-criteria-met
 ]
 
-to get-dataset 
+to backpropagation-train [ data n-hidden-layers ]
   
-  ;; get data from somewhere (???)
-  set dataset ifelse-value ( data-source = "procedure" ) [ ask-procedure-name ] [ get-dataset-from-file ]
+  let af get-af
+  let daf get-daf
+ 
+  let cross-validation-datasets ( split-for-cross-validation data )
   
-end
-
-to-report ask-procedure-name
-  
-  let procedure-name user-input "Enter procedure name "
-  
-  report runresult procedure-name
-  
-end
-
-to-report get-dataset-from-file
-
-  ;; TO DO: Implement
-  report ( list )
-
-end
-
-to begin-train
-  
-  let af ifelse-value ( activation-function = "softsing" ) 
-            [ task softsign-function ] 
-            [ ifelse-value ( activation-function = "hyperbolic-tangent" )  [ task hyperbolic-tangent-function ] [ task logistic-function ] ]
-  
-  let daf ifelse-value ( activation-function = "softsing" ) 
-             [ task softsign-function-derivative ] 
-             [ ifelse-value ( activation-function = "hyperbolic-tangent" ) [ task hyperbolic-tangent-function-derivative ] [ task logistic-function-derivative ] ]
-  
-  let cross-validation-datasets ( split-for-cross-validation dataset )
+  set epoch-error 0
+  set validation-error 0
+  set test-error 0
   
   let training-set item 0 cross-validation-datasets
   let validation-set item 1 cross-validation-datasets
   let test-set item 2 cross-validation-datasets
   
-  train training-set af daf
+  train training-set af daf n-hidden-layers
   
-  validate validation-set af
+  validate validation-set af n-hidden-layers
   
-  test test-set af
+  test test-set af n-hidden-layers
   
   recolor
   
@@ -61,92 +35,9 @@ to begin-train
   
 end
 
-to validate [ validation-set af ]
+to propagate [ af n-hidden-layers ]
   
-  foreach validation-set 
-  [
-    let input-data ( item 0 ? )
-    let out-data ( item 1 ? )
-    
-    activate-inputs input-data
-    
-    propagate af
-    
-    calc-output-nodes-error out-data
-  ]
-  
-  set validation-error sum [ err ^ 2 ] of output-nodes
-  
-end
-
-to test [ test-set af ]
-  
-  foreach test-set 
-  [
-    let input-data ( item 0 ? )
-    let out-data ( item 1 ? )
-    
-    activate-inputs input-data
-    
-    propagate af
-    
-    calc-output-nodes-error out-data
-  ]
-  
-  set test-error sum [ err ^ 2 ] of output-nodes
-  
-end
-
-to train [ training-set af daf ]
-  
-  set epoch-error -1
-  
-  foreach training-set 
-  [
-    ; pair of input-data and out-data is array
-    ; input-data -> array
-    ; out-data -> array
-    let input-data ( item 0 ? )
-    let out-data ( item 1 ? )
-    
-    activate-inputs input-data
-    
-    propagate af
-    
-    calc-output-nodes-error out-data
-    
-    ifelse ( backprop-implementation = "back-propagate" )
-    [
-      back-propagate daf
-    ]
-    [
-      back-propagate-haykin daf
-    ]
-  ]
-  
-  set epoch-error sum [ err ^ 2 ] of output-nodes
-  
-end
-
-to activate-inputs [ input-data ]
-  
-  let i 0
-  
-  foreach sort-on [ who ] input-nodes
-  [
-    ask ? 
-    [
-      set activation ( item i input-data )
-    ]
-    
-    set i i + 1 
-  ] 
-  
-end
-
-to propagate [ af ]
-  
-  foreach ( n-values num-hidden-layers [?] )
+  foreach ( n-values n-hidden-layers [?] )
   [
     ask hidden-nodes with [ layer = ? ]
     [
@@ -163,37 +54,85 @@ to propagate [ af ]
   
 end
 
-to-report induced-local-field
+to validate [ validation-set af num-h-layers ]
   
-  report sum [ [ activation ] of end1 * weight ] of my-in-links
-  
-end
-
-
-to calc-output-nodes-error [ expected-out ] 
-  
-  let i 0
-  
-  foreach sort-on [ who ] output-nodes 
+  foreach validation-set 
   [
-    ask ? 
-    [
-      set err ( item i expected-out ) - activation
-    ]
+    let input-data ( item 0 ? )
+    let out-data ( item 1 ? )
     
-    set i ( i + 1 )
+    activate-inputs input-data
+    
+    propagate af num-h-layers
+    
+    calc-output-nodes-error out-data
+    
+    set validation-error ( validation-error + sum [ err ^ 2 ] of output-nodes )
   ]
   
+  set validation-error ( 1 / ( 2 * length validation-set ) ) * validation-error
+  
 end
 
-to back-propagate [ daf ]
+to test [ test-set af num-h-layers ]
+  
+  foreach test-set 
+  [
+    let input-data ( item 0 ? )
+    let out-data ( item 1 ? )
+    
+    activate-inputs input-data
+    
+    propagate af num-h-layers
+    
+    calc-output-nodes-error out-data
+    
+    set test-error ( test-error + sum [ err ^ 2 ] of output-nodes )
+  ]
+  
+  set test-error ( 1 / ( 2 * length test-set ) ) * test-error
+  
+end
+
+to train [ training-set af daf n-hidden-layers ]
+  
+  foreach training-set 
+  [
+    ; pair of input-data and out-data is array
+    ; input-data -> array
+    ; out-data -> array
+    let input-data ( item 0 ? )
+    let out-data ( item 1 ? )
+    
+    activate-inputs input-data
+    
+    propagate af n-hidden-layers
+    
+    calc-output-nodes-error out-data
+    
+    ifelse ( training-algorithm = "back-propagate" )
+    [
+      back-propagate daf n-hidden-layers
+    ]
+    [
+      back-propagate-haykin daf n-hidden-layers
+    ]
+    
+    set epoch-error ( epoch-error + sum [ err ^ 2 ] of output-nodes )
+  ]
+  
+  set epoch-error ( 1 / ( 2 * length training-set ) ) * epoch-error
+  
+end
+
+to back-propagate [ daf n-hidden-layers ]
   
   ask output-nodes 
   [
     set local-gradient err * ( runresult daf activation )
   ]
   
-  foreach ( reverse n-values num-hidden-layers [?] )
+  foreach ( reverse n-values n-hidden-layers [?] )
   [
     ask hidden-nodes with [ layer = ? ]
     [
@@ -210,7 +149,7 @@ to back-propagate [ daf ]
 end
 
 
-to back-propagate-haykin [ daf ]
+to back-propagate-haykin [ daf n-hidden-layers ]
   
   ask output-nodes 
   [
@@ -223,7 +162,7 @@ to back-propagate-haykin [ daf ]
     ]
   ]
   
-  foreach ( reverse n-values num-hidden-layers [?] )
+  foreach ( reverse n-values n-hidden-layers [?] )
   [
     ask hidden-nodes with [ layer = ? ]
     [

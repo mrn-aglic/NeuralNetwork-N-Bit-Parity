@@ -1,0 +1,145 @@
+globals
+[
+  f-error 
+  f-new-error
+  T-usable
+]
+
+links-own [ new-weight ]
+
+to simulated-annealing-train [ data n-hidden-layer ]
+  
+  if ( terminate ) [ stop ]
+  
+  let af get-af
+  
+  if ( ticks = 0 ) 
+  [ 
+    sa-init-weights
+    
+    set f-error ( sse af ( task induced-local-field ) data n-hidden-layer )
+    set T-usable T
+  ]
+  
+  repeat iterations 
+  [
+    ask links 
+    [
+      let new-value weight + get-weight-preturb
+      set new-value ifelse-value ( new-value > weight-bound ) [ weight-bound ] [ ifelse-value ( new-value < ( - weight-bound ) ) [ ( - weight-bound ) ] [ new-value ] ]
+      set new-weight new-value
+      
+      if ( clip-weights? )
+      [
+        set new-weight precision new-weight 5
+      ]
+    ]
+    
+    set f-new-error ( sse af ( task new-weight-induced-local-field ) data n-hidden-layer )
+    
+    let delta-error f-new-error - f-error
+    
+    ifelse delta-error <= 0
+    [
+      make-switch
+    ]
+    [
+      let exponent ( delta-error / T-usable )
+      
+      ;if ( random-float 1 ) < ( 1 / ( 1 + e ^ exponent ) )
+      if ( random-float 1 ) < ( e ^ ( -  exponent ) )
+      [
+        make-switch
+      ]
+    ]
+    
+    recolor
+    
+    tick
+  ]
+  
+  set T-usable cooling-factor * T-usable 
+  
+end
+
+to sa-init-weights 
+  
+  ask links [ set weight random-float ( weight-bound * 2 ) - weight-bound ]
+  
+end
+
+to make-switch
+  
+  ask links [ set weight new-weight ]
+  
+  set f-error f-new-error
+  
+end
+
+to-report get-weight-preturb 
+  
+  report ( random-float ( preturb-limit * 2 ) ) - preturb-limit
+  
+end
+
+;; data [ example: [ in: [], out: [] ] ]
+to-report sse [ af local-field-fun data n-hidden-layer ]
+  
+  let _error 0
+  
+  foreach data 
+  [
+    let in first ? 
+    let out last ?
+    
+    activate-inputs in
+    
+    sa-propagate af local-field-fun n-hidden-layer
+    
+    calc-output-nodes-error out
+    
+    set _error _error + sum [ err ^ 2 ] of output-nodes 
+  ]
+  
+  report _error
+  
+end
+
+to sa-propagate [ af induced-field-task n-hidden-layers ]
+  
+  foreach ( n-values n-hidden-layers [?] )
+  [
+    ask hidden-nodes with [ layer = ? ]
+    [
+      set local-field ( runresult induced-field-task )
+      set activation ( runresult af local-field )
+    ]
+  ]
+  
+  ask output-nodes 
+  [
+    set local-field ( runresult induced-field-task )
+    set activation ( runresult af local-field )
+  ]
+  
+end
+
+to-report new-weight-induced-local-field
+  
+  report sum [ [ activation ] of end1 * new-weight ] of my-in-links
+  
+end
+
+to-report terminate
+  
+  ifelse ( sa-termination = "temperature" )
+  [ 
+    report T <= T-min 
+  ]
+  [
+    ifelse ( sa-termination = "MSE" ) 
+    [ report f-error <= MSE-threshold  ]
+    [ report ticks >= iterations ]
+  ]
+  
+end

@@ -1,0 +1,146 @@
+globals [ hidden-layers-count ]
+
+breed [ m-hidden-nodes m-hidden-node ]
+breed [ modules module ]
+
+modules-own 
+[
+  input-members
+  hidden-members
+  output-members
+  module-data
+]
+
+m-hidden-nodes-own
+[
+  local-field
+  activation
+  layer
+  local-gradient
+  err
+]
+
+to init
+  
+  clear-all
+  
+  reset-ticks
+  
+  ask patches [ set pcolor 9.5 ] 
+  
+  set connection-link-type "connection-link"
+
+  set-default-shape bias-nodes "bias-node"
+  set-default-shape input-nodes "circle"
+  set-default-shape output-nodes "output-node"
+  set-default-shape m-hidden-nodes "output-node"
+  set-default-shape links "small-arrow-shape"
+
+  set ff-connections-color cyan
+  set learning-connections-color red
+  
+end
+
+to make-n-modular-networks 
+  
+  init
+  
+  let m partition-size
+  let N num-input-nodes
+  let k ( get-largest-exponent N m )
+  
+  let layers-num -1
+  
+  repeat num-modular-networks
+  [
+    ifelse ( m ^ k = N ) 
+    [
+      set layers-num ( 2 * k - 1 )
+      
+      homogenous-net layers-num
+    ]
+    [
+      heterogenous-net
+    
+      let factors factorize N m
+      let partial sum map last factors
+      set layers-num ( partial * 2 - 1 )
+    ]
+  ]
+  
+  ask modules [ set hidden? true ]
+  
+  position-modular-network-nodes num-modular-networks layers-num
+  
+  set hidden-layers-count layers-num
+  
+  recolor
+    
+end
+
+to begin-train-modular
+  
+  ifelse training-algorithm = "back-propagate" or training-algorithm  = "back-propagate (update weights layer-by-layer)"
+  [
+    backpropagation-train load-data hidden-layers-count
+  ]
+  [
+    if training-algorithm = "simulated annealing"
+    [
+      simulated-annealing-train load-data hidden-layers-count
+    ]
+  ]
+  
+end
+
+to position-modular-network-nodes [ num-networks num-layers ]
+  
+  let inx max-pxcor / ( num-layers + 3 )
+  let iny max-pycor
+  let d floor  ( - ( min-pycor /  ( num-input-nodes * num-networks + 2 ) ) )
+  
+  let hx inx
+  
+  foreach ( sort-on [ who ] input-nodes )
+  [
+    set iny iny - d
+        
+    ask ? [ setxy inx iny ]
+  ]
+  
+  foreach sort-on [ who ] modules
+  [
+    ask ?
+    [
+      let candidates sort-on [ who ] input-members
+      
+      foreach sort-on [ who ] hidden-members
+      [
+        ask ?
+        [
+          let chosen first candidates 
+          set candidates but-first candidates
+        
+          set xcor get-dx hx layer
+          set ycor [ ycor ] of chosen
+        ]
+      ]
+      
+      foreach sort-on [ who ] output-members
+      [
+        ask ?
+        [
+          ifelse ( is-output-node? self )
+          [
+            set xcor max-pxcor - hx
+          ]
+          [
+            set xcor get-dx hx layer
+          ]
+          set ycor sum [ [ ycor ] of hidden-members ] of myself / count [ hidden-members ] of myself
+        ]
+      ]
+    ]
+  ]
+  
+end

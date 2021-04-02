@@ -1,0 +1,129 @@
+to add-hidden-and-output-members [ arg-module hx l lmax ]
+  
+  ask arg-module 
+  [
+    let new-hidden-members nobody
+    let new-output-members nobody
+    
+    foreach sort-on [ who ] input-members 
+    [
+      ask ?
+      [
+        hatch-hidden-nodes 1
+        ;hatch-m-hidden-nodes 1
+        [
+          set new-hidden-members ( turtle-set new-hidden-members self )
+        
+          init-hidden-node l hx
+        ]
+      ]
+    ]
+    
+    set hidden-members ( turtle-set hidden-members new-hidden-members )
+    
+    ifelse ( l < lmax )
+    [
+      hatch-hidden-nodes 1
+      ;hatch-m-hidden-nodes 1
+      [
+        set new-output-members ( turtle-set new-output-members self )
+        
+        init-hidden-node ( l + 1 ) hx
+        
+        set ycor ( sum [ [ ycor ] of hidden-members ] of myself / ( count [ hidden-members ] of myself ) )
+      ]
+    ]
+    [
+      hatch-output-nodes 1
+      [
+        set new-output-members ( turtle-set new-output-members self )
+        
+        set color red
+        set size 2
+        set xcor max-pxcor - hx
+        
+        set ycor ( sum [ [ ycor ] of hidden-members ] of myself / ( count [ hidden-members ] of myself ) )
+      ]
+    ]
+    
+    set output-members ( turtle-set output-members new-output-members )
+    
+    full-connect-layers input-members hidden-members
+    full-connect-layers hidden-members output-members
+  ]
+  
+end
+
+to construct-modules [ hx layers-num m toskip ]
+  
+  let current-modules sort-on [ who ] modules
+  let lmax layers-num - 1
+  
+  let layers filter [ ? mod 2 = 0 ] ( skip ( n-values layers-num [ ? ] ) toskip ) 
+  
+  foreach layers
+  [
+    let l ?
+    
+    let m-tuples ( splitBy current-modules m )
+    
+    ifelse ( l = 0 )
+    [
+      ;; Added for creating modular networks from scratch
+      ;; 
+      let new-modules []
+        
+      foreach n-values ( num-input-nodes / m ) [ ? ]
+      [
+        let new-module nobody
+        
+        create-modules 1
+        [
+          let new-input-members nobody
+          
+          hatch-input-nodes m 
+          [
+            set size 2
+            set color green
+            set new-input-members ( turtle-set new-input-members self )
+          ]
+          
+          set input-members new-input-members
+          set hidden-members nobody
+          set output-members nobody
+          
+          set new-module self
+          set new-modules lput self new-modules
+        ]
+        
+        add-hidden-and-output-members new-module hx l lmax
+      ]
+      ;; end add (from scratch)
+      
+      set current-modules new-modules
+    ]
+    [
+      let new-modules []
+    
+      foreach m-tuples 
+      [
+        let new-module-input-members turtle-set [ output-members ] of ( turtle-set ? )
+        let current nobody
+        
+        create-modules 1 
+        [
+          set input-members new-module-input-members
+          set hidden-members nobody
+          set output-members nobody
+          set current self
+          set new-modules lput self new-modules
+        ]
+        
+        set current-modules new-modules
+        
+        add-hidden-and-output-members current hx l lmax
+      ]
+    ]
+  ]
+  
+end

@@ -1,61 +1,17 @@
-to-report logistic-function [ input ]
+to-report get-af
   
-  report 1 / ( 1 + e ^ ( - input * logistic-param-a ) )
-  
-end 
-
-to-report hyperbolic-tangent-function [ input ]
-
-  report ahyper-const * ( tanh ( bhyper-const * input ) )
-
+  report ifelse-value ( activation-function = "step" ) [ task step-ui-threshold ] 
+         [ ifelse-value ( activation-function = "softsing" ) 
+            [ task softsign-function ] 
+            [ ifelse-value ( activation-function = "hyperbolic-tangent" )  [ task hyperbolic-tangent-function ] [ task logistic-function ] ] ]
+            
 end
 
-to-report softsign-function [ input ]
+to-report get-daf
   
-  report input / ( 1 + abs input  ) 
-  
-end
-
-to-report logistic-function-derivative [ input ]
-  
-  report logistic-param-a * input * ( 1 - input )
+  report ifelse-value ( activation-function = "softsing" ) 
+             [ task softsign-function-derivative ] 
+             [ ifelse-value ( activation-function = "hyperbolic-tangent" ) [ task hyperbolic-tangent-function-derivative ] [ task logistic-function-derivative ] ]
   
 end
 
-to-report hyperbolic-tangent-function-derivative [ input ]
-
-  report ( bhyper-const / ahyper-const ) * ( ahyper-const - input ) * ( ahyper-const + input )
-
-end
-
-to-report softsign-function-derivative [ input ]
-  
-  report 1 / ( ( 1 + abs input ) ^ 2 )
-  
-end
-
-to-report step [ input threshold ]
-  
-  report ifelse-value ( input <= threshold ) [ 0 ] [ 1 ]
-  
-end
-
-to-report sign [ input threshold ]  
-
-  ifelse input > threshold
-  [ report 1 ]
-  [ report -1 ]
-
-end
-
-to-report identity [ x ]
-  
-  report x
-  
-end
-
-to-report tanh [ x ]
-  
-  report ( e ^ ( 2 * x ) - 1 ) / ( e ^ ( 2 * x ) + 1 )
-  
-end

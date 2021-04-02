@@ -11,9 +11,15 @@ to test-backpropagation
   
   let num-examples-predefined 1000
   
-  set dataset generate-test-dataset num-examples-predefined 
+  ifelse ( target-function = "n-bit-parity" )
+  [
+    set dataset generate-n-bit-parity-dataset num-examples-predefined
+  ]
+  [
+    set dataset generate-test-dataset num-examples-predefined 
+  ]
   
-  begin-train
+  backpropagation-train dataset num-hidden-layers
   
 end
 
@@ -23,7 +29,19 @@ to-report target-answer
   let a [ activation ] of min-one-of input-nodes [ who ] = 1
   let b [ activation ] of max-one-of input-nodes [ who ] = 1
   
-  report ifelse-value runresult ( word "a " target-function " b" ) [ 1 ][ 0 ] 
+  report ifelse-value runresult ( word "my-" target-function " a b" ) [ 1 ][ 0 ] 
+  
+end
+
+to-report my-nand [ a b ] 
+  
+  report not ( a and b )
+  
+end
+
+to-report my-nor [ a b ]
+  
+  report not ( a or b )
   
 end
 
@@ -31,6 +49,24 @@ to-report generate-test-dataset [ _count ]
   
   report n-values _count [ generate-dataset-pair ]
 
+end
+
+to-report my-and [ a b ]
+
+  report a and b
+
+end
+
+to-report my-or [ a b ]
+  
+  report a or b
+  
+end
+
+to-report my-xor [ a b ]
+  
+  report a xor b
+  
 end
 
 ;; a dataset pair is an input vector x with a target vector y
@@ -42,7 +78,7 @@ to-report generate-dataset-pair
   let a random 2
   let b random 2
   
-  let c ifelse-value runresult ( word "a = 1 " target-function " b = 1" ) [ 1 ] [ 0 ]
+  let c ifelse-value ( runresult ( word "( my-" target-function " ( a = 1 ) ( b = 1 ) )" ) ) [ 1 ] [ 0 ]
   
   let input-vector (list a b)
   let target-vector (list c)
@@ -71,7 +107,7 @@ to-report get-result-for-user-test-input [ in1 in2 ]
             [ task softsign-function ]
             [ ifelse-value ( activation-function = "hyperbolic-tangent" ) [ task hyperbolic-tangent-function ] [ task logistic-function ] ]
   
-  propagate af
+  propagate af num-hidden-layers
   
   let threshold 0.5
   

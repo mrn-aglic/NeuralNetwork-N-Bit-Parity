@@ -30,3 +30,69 @@ to recolor
   ]
   
 end
+
+to-report splitBy [ xs n ]
+  
+  ifelse ( empty? xs ) 
+  [
+    report []
+  ]
+  [
+    let el ( take xs n )
+    let rest ( skip xs n )
+    
+    report ( fput el ( splitBy rest n ) )
+  ]
+  
+end
+
+to-report skip [ l n ]
+  
+  ifelse ( n <= 0 or empty? l )
+  [
+    report l
+  ]
+  [
+    report skip ( but-first l ) ( n - 1 )
+  ]
+  
+end
+
+to-report take [ l n ]
+  
+  ifelse ( n <= 0 or empty? l ) 
+  [ 
+    report []
+  ]
+  [
+    report ( fput first l ( take ( but-first l ) ( n - 1 ) ) )
+  ]
+  
+end
+
+to-report get-dx [ hx l ]
+  
+  report hx + ( l + 1 ) * hx
+  
+end
+
+to init-hidden-node [ l hx ]
+  
+  set color blue
+  set layer l
+  set xcor ( get-dx hx l )
+  set size 2
+
+end
+
+to-report input-activations
+  
+  report map [ [ activation ] of ? ] sort-on [ who ] input-nodes
+  
+end
+
+to-report output-activations
+  
+  report map [ [ activation ] of ? ] sort-on [ who ] output-nodes
+  
+end

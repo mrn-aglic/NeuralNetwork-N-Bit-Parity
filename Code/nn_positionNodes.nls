@@ -10,16 +10,19 @@ to position-in-nodes
   
   let inx max-pxcor / ( num-hidden-layers + 3 )
   let iny max-pycor
-  let d ceiling  ( - ( min-pycor /  ( num-in-nodes + 2 ) ) )
+  let d floor  ( - ( min-pycor /  ( num-in-nodes + 2 ) ) )
   
-  ask min-one-of bias-nodes [who] 
+  if ( any? bias-nodes )
   [
-    set iny iny - d
+    ask min-one-of bias-nodes [who] 
+    [
+      set iny iny - d
     
-    setxy inx iny
+      setxy inx iny
     
-    set input-bias? true
-    set added-to-layer? true
+      set input-bias? true
+      set added-to-layer? true
+    ]
   ]
   
   foreach (sort-on [who] input-nodes )
@@ -42,22 +45,25 @@ to position-hidden-nodes
     let ddy ceiling ( - ( min-pycor / ( table:get nodes-per-hidden-layer ? + 2 ) ) )
     let l ?
     
-    ask min-one-of bias-nodes with [ not added-to-layer? and not input-bias? ] [who] 
+    if ( any? bias-nodes )
     [
-      set layer l
+      ask min-one-of bias-nodes with [ not added-to-layer? and not input-bias? ] [who] 
+      [
+        set layer l
       
-      set hy hy - ddy
+        set hy hy - ddy
       
-      setxy ( hx + ( l + 1 ) * hx ) hy 
+        setxy ( get-dx hx l ) hy 
       
-      set added-to-layer? true
+        set added-to-layer? true
+      ]
     ]
     
     foreach sort-on [who] hidden-nodes with [layer = l]
     [
       set hy hy - ddy
       
-      ask ? [ setxy (hx + ( l + 1 ) * hx) hy ] 
+      ask ? [ setxy ( get-dx hx l ) hy ] 
     ]
   ]
   
@@ -77,3 +83,4 @@ to position-out-nodes
   ]
   
 end
+

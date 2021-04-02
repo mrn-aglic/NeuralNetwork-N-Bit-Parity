@@ -1,0 +1,117 @@
+to heterogenous-net 
+  
+  let factors ( factorize num-input-nodes partition-size )  
+  
+  create-heterogenous-net factors
+  
+end
+
+to create-heterogenous-net [ factors ]
+  
+  let k-sum sum map last factors
+  
+  let num-layers ( k-sum * 2 ) - 1
+  let hx max-pxcor / ( num-layers + 3 )
+  
+  let last-factor ( last factors )
+  let mapped-factors lput ( replace-item 1 last-factor ( last last-factor * 2 - 1 ) ) ( but-last map [ ( list ( first ? ) ( last ? * 2 ) ) ] factors )
+  
+  let layers-added 0
+  let toskip 0
+  
+  let i 0
+  
+  foreach mapped-factors
+  [
+    let m first ?
+    let k last ?
+    
+    set layers-added ( layers-added + k )
+    
+    construct-modules hx layers-added m toskip
+    
+    set toskip layers-added  
+  ]
+    
+end
+
+to-report sieve-of-eratosthenes [ x ]
+  
+  let values n-values ( x - 1 ) [ ? + 2 ]
+  
+  if ( empty? values ) [ report [] ]
+  
+  let ref-value first values
+  
+  while [ ref-value * ref-value <= x ]
+  [
+    set values filter [ ref-value = ? or ? mod ref-value != 0 ] values
+    
+    set ref-value first ( filter [ ? > ref-value] values )
+  ]
+  
+  report values
+  
+end
+
+to-report factorize [ N m ]
+  
+  if ( N < 2 or m < 2 or N < m ) [ report [] ]
+  
+  let result []
+  
+  let k ( get-largest-exponent N m )
+  
+  let me m ^ k 
+  let pair [] 
+  let kvocient 1
+  
+  set k get-largest-k-possible N m k
+  set pair ( list m k )
+  
+  set kvocient N / ( m ^ k )
+  
+  let prime-factors reverse ( filter [ kvocient mod ? = 0 ] ( sieve-of-eratosthenes kvocient ) )
+  
+  set result lput pair result
+  
+  foreach prime-factors
+  [
+    let ex ( get-largest-exponent kvocient ? )
+    
+    set ex get-largest-k-possible kvocient ? ex
+    
+    set pair ( list ? ex )
+    
+    set result lput pair result
+  ]
+  
+  report result
+  
+end
+
+to-report get-largest-k-possible [ N m k ]
+  
+  let me m ^ k
+  
+  ifelse ( N mod me = 0 )
+  [
+    report k
+  ]
+  [
+    while [ N mod me != 0 ]
+    [
+      set k ( k - 1 )
+      set me m ^ k
+    ]
+  ]
+  
+  report k
+  
+end 
+
+to-report get-largest-exponent [ N m ]
+  
+  report floor ( log N m )
+  
+end

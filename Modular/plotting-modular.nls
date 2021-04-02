@@ -1,0 +1,17 @@
+to setup-modular-error-epoch-plot
+  
+  set-current-plot "Error vs Epochs per module"
+  
+  let col red
+  
+  foreach sort-on [ who ] modules
+  [
+    let name ( word "error-module-" [ who ] of ? )
+    
+    create-temporary-plot-pen name
+    set-current-plot-pen name
+    set col col + 10
+    set-plot-pen-color col
+  ]
+  
+end

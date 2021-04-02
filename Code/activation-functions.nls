@@ -1,0 +1,67 @@
+to-report logistic-function [ input ]
+  
+  report 1 / ( 1 + e ^ ( - input * logistic-param-a ) )
+  
+end 
+
+to-report hyperbolic-tangent-function [ input ]
+
+  report ahyper-const * ( tanh ( bhyper-const * input ) )
+
+end
+
+to-report softsign-function [ input ]
+  
+  report input / ( 1 + abs input  ) 
+  
+end
+
+to-report logistic-function-derivative [ input ]
+  
+  report logistic-param-a * input * ( 1 - input )
+  
+end
+
+to-report hyperbolic-tangent-function-derivative [ input ]
+
+  report ( bhyper-const / ahyper-const ) * ( ahyper-const - input ) * ( ahyper-const + input )
+
+end
+
+to-report softsign-function-derivative [ input ]
+  
+  report 1 / ( ( 1 + abs input ) ^ 2 )
+  
+end
+
+to-report step-ui-threshold [ input ]
+  
+  report step input step-threshold
+  
+end
+
+to-report step [ input threshold ]
+  
+  report ifelse-value ( input <= threshold ) [ 0 ] [ 1 ]
+  
+end
+
+to-report sign [ input threshold ]  
+
+  ifelse input > threshold
+  [ report 1 ]
+  [ report -1 ]
+
+end
+
+to-report identity [ x ]
+  
+  report x
+  
+end
+
+to-report tanh [ x ]
+  
+  report ( e ^ ( 2 * x ) - 1 ) / ( e ^ ( 2 * x ) + 1 )
+  
+end

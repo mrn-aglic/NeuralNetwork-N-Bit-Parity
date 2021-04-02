@@ -3,14 +3,16 @@ to-report split-for-cross-validation [ _dataset ]
   let num-examples length _dataset
   let randomized shuffle _dataset
   
-  let training-set-size floor ( num-examples * 0.75 )
-  let validation-set-size floor ( num-examples - training-set-size ) * 0.5
+  let rounding-fun ifelse-value ( num-examples < 5 ) [ task ceiling ] [ task floor ]
+  
+  let training-set-size ( runresult rounding-fun ( num-examples * 0.75 ) )
+  let validation-set-size ( runresult rounding-fun ( ( num-examples - training-set-size ) * 0.5 ) )
   let test-set-size ( num-examples - validation-set-size - training-set-size )
   
-  let training-set sublist randomized 0 training-set-size
+  let training-set_ sublist randomized 0 training-set-size
   let validation-set sublist randomized training-set-size ( training-set-size + validation-set-size )
   let test-set sublist randomized ( training-set-size + validation-set-size ) num-examples
   
-  report ( list training-set validation-set test-set )
+  report ( list training-set_ validation-set test-set )
   
 end

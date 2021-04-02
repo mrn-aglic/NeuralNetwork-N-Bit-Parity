@@ -1,0 +1,37 @@
+to-report induced-local-field
+  
+  report sum [ [ activation ] of end1 * weight ] of my-in-links
+  
+end
+
+to activate-inputs [ input-data ]
+  
+  let i 0
+  
+  foreach sort-on [ who ] input-nodes
+  [
+    ask ? 
+    [
+      set activation ( item i input-data )
+    ]
+    
+    set i i + 1 
+  ] 
+  
+end
+
+to calc-output-nodes-error [ expected-out ] 
+  
+  let i 0
+  
+  foreach sort-on [ who ] output-nodes 
+  [
+    ask ? 
+    [
+      set err ( item i expected-out ) - activation
+    ]
+    
+    set i ( i + 1 )
+  ]
+  
+end

@@ -1,0 +1,445 @@
+globals 
+[
+  epoch-errors-per-module
+  validation-errors-per-module
+  test-errors-per-module
+  
+  f-values-per-module
+  f-new-values-per-module
+  
+  T-values-per-module
+]
+
+to init-globals
+  
+  set epoch-error 0
+  set validation-error 0
+  set test-error 0
+  
+  set epoch-errors-per-module n-values ( count modules ) [ 0 ]
+  set validation-errors-per-module n-values ( count modules ) [ 0 ]
+  set test-errors-per-module n-values ( count modules ) [ 0 ]
+  
+end
+
+to train-by-module
+  
+  ifelse training-algorithm = "back-propagate" or training-algorithm  = "back-propagate (update weights layer-by-layer)"
+  [
+    backpropagation-train-by-module ( max [ layer ] of hidden-nodes )
+  ]
+  [
+    simulated-annealing-by-module hidden-layers-count
+  ]
+  
+end
+
+to-report prepare-data-modular
+  
+  let num-examples 1000
+  
+  report n-values num-examples [ generate-n-element-dataset-entry partition-size ]
+  
+end
+
+;; Here begins modular backpropagation train
+
+to backpropagation-train-by-module [ n-hidden-layers ]
+  
+  let data prepare-data-modular
+  
+  let af get-af
+  let daf get-daf
+ 
+  let cross-validation-datasets ( split-for-cross-validation data )
+  
+  init-globals
+  
+  let training-set item 0 cross-validation-datasets
+  let validation-set item 1 cross-validation-datasets
+  let test-set item 2 cross-validation-datasets
+  
+  ;; assume that a module has exactly one hidden-layer in hidden-members that is not shared with anyone else
+  let module-layers sort-by < map first remove-duplicates [ [ layer ] of hidden-members ] of modules
+  ;let n-module-layers length module-layers
+  
+  ;; simple separation of training-set per module for the n-bit-parity-problem
+  let module-training-data splitBy training-set ( count modules )
+  
+  let i 0
+  
+  foreach module-layers
+  [
+    foreach sort-on [ who ] modules with [ any? hidden-members with [ layer = ? ] ]
+    [
+      let training-data first sublist module-training-data 0 1
+      
+      ask ?
+      [
+        let layers-in-module remove-duplicates [ layer ] of hidden-members
+      
+        let module-epoch-error ( bp-train-by-module self training-data af daf layers-in-module )
+        
+        set epoch-errors-per-module  ( replace-item i epoch-errors-per-module module-epoch-error )
+        
+        recolor
+      ]
+      
+      set i ( i + 1 )
+      
+      set module-training-data ( skip module-training-data 1 )
+    ]
+  ]
+  
+  network-epoch-error training-set af n-hidden-layers
+  
+  ;; from "Code/backpropagation.nls"
+  ;; uncomment
+  ;validate validation-set af n-hidden-layers
+  
+  ;test test-set af n-hidden-layers
+  
+  recolor
+  
+  tick
+  
+end
+
+to network-epoch-error [ training-set af n-hidden-layers ]
+  
+  foreach training-set  
+  [
+    let input-data ( item 0 ? )
+    let out-data ( item 1 ? )
+    
+    activate-inputs input-data
+    
+    propagate af n-hidden-layers
+    
+    calc-output-nodes-error out-data
+    
+    set epoch-error ( test-error + sum [ err ^ 2 ] of output-nodes )
+  ]
+  
+  set epoch-error ( 1 / ( 2 * length training-set ) ) * test-error
+  
+end
+
+to propagate-module [ module af layers-in-module ]
+  
+  ask module
+  [
+    foreach layers-in-module
+    [
+      ask hidden-members with [ layer = ? ]
+      [
+        set local-field induced-local-field
+        set activation ( runresult af local-field )
+      ]
+    ]
+  
+    ask output-members 
+    [
+      set local-field induced-local-field
+      set activation ( runresult af local-field )
+    ]
+  ]
+  
+end
+
+to-report bp-train-by-module [ module training-set af daf layers-in-module ]
+  
+  let module-epoch-error 0
+  
+  foreach training-set 
+  [
+    ; pair of input-data and out-data is array
+    ; input-data -> array
+    ; out-data -> array
+    let input-data ( item 0 ? )
+    let out-data ( item 1 ? )
+    
+    activate-input-members module input-data
+    
+    propagate-module module af layers-in-module
+    
+    calc-output-members-error module out-data
+    
+    ifelse ( training-algorithm = "back-propagate" )
+    [
+      backward-pass-by-module module daf layers-in-module
+    ]
+    [
+      backward-pass-by-module-haykin module daf layers-in-module
+    ]
+    
+    set module-epoch-error ( module-epoch-error + sum [ err ^ 2 ] of output-members )
+  ]
+  
+  set module-epoch-error ( 1 / ( 2 * length training-set ) ) * module-epoch-error
+  
+  report module-epoch-error
+  
+end
+
+to backward-pass-by-module [ module daf layers-in-module ]
+  
+  ask module
+  [
+    ask output-members
+    [
+      set local-gradient err * ( runresult daf activation )
+    ]
+  
+    foreach ( reverse layers-in-module )
+    [
+      ask hidden-members with [ layer = ? ]
+      [
+        set local-gradient ( runresult daf activation ) * sum [ weight * [local-gradient] of end2 ] of my-out-links
+      ]
+    ]
+  ]
+  
+  ask module
+  [
+    ask links with [ link-type = connection-link-type ]
+    [
+      set velocity momentum * velocity + learning-rate * [ activation ] of end1 * [ local-gradient ] of end2
+      set weight weight + velocity
+    ]
+  ]
+  
+end
+
+to backward-pass-by-module-haykin [ module daf layers-in-module ]
+  
+  ask module
+  [
+    ask output-members
+    [
+      set local-gradient err * ( runresult daf activation )
+      
+      ask my-in-links
+      [
+        set velocity ( momentum * velocity + learning-rate * [ activation ] of end1 * [ local-gradient ] of end2 )
+        set weight weight + velocity
+      ]
+    ]
+  
+    foreach ( reverse layers-in-module )
+    [
+      ask hidden-members with [ layer = ? ]
+      [
+        set local-gradient ( runresult daf activation ) * sum [ weight * [ local-gradient ] of end2 ] of my-out-links
+        
+        ask my-in-links
+        [
+          set velocity ( momentum * velocity + learning-rate * [ activation ] of end1 * [ local-gradient ] of end2 )
+          set weight weight + velocity
+        ]
+      ]
+    ]
+  ]
+  
+end
+
+to activate-input-members [ module input-data ]
+  
+  ask module
+  [
+    let i 0
+    
+    foreach sort-on [ who ] input-members
+    [
+      ask ? [ set activation item i input-data ]
+      
+      set i ( i + 1 )
+    ]
+  ]
+  
+end
+
+to calc-output-members-error [ module expected-out ] 
+  
+  ask module
+  [
+    let i 0
+  
+    foreach sort-on [ who ] output-members 
+    [
+      ask ? 
+      [
+        set err ( item i expected-out ) - activation
+      ]
+    
+      set i ( i + 1 )
+    ]
+  ]
+  
+end
+
+;; here begins simulated annealing by module
+
+to simulated-annealing-by-module [ n-hidden-layers ]
+  
+  init-globals
+  
+  let data prepare-data-modular
+  
+  if ( terminate ) [ stop ]
+  
+  let af get-af
+  
+  ;; assume that a module has exactly one hidden-layer in hidden-members that is not shared with anyone else
+  let module-layers sort-by < map first remove-duplicates [ [ layer ] of hidden-members ] of modules
+  
+  ;; data should be replaced with training if I decide to use validation and test sets
+  let module-training-data splitBy data ( count modules )
+  
+  if ( ticks = 0 ) 
+  [ 
+    sa-init-weights
+    
+    set T-values-per-module ( n-values ( count modules ) [ T ] )
+    set f-values-per-module ( n-values ( count modules ) [ 0 ] )
+    
+    let i 0
+    
+    foreach sort-on [ who ] modules 
+    [
+      let result ( sse-modular ? af ( task induced-local-field ) ( sublist module-training-data 0 1 ) n-hidden-layers )
+      
+      set f-values-per-module ( replace-item i f-values-per-module result )
+      
+      set i ( i + 1 )
+    ]
+  ]
+  
+  let i 0
+  
+  foreach module-layers
+  [
+    foreach sort-on [ who ] modules with [ any? hidden-members with [ layer = ? ] ]
+    [
+      let training-data first sublist module-training-data 0 1
+      
+      ask ?
+      [
+        let layers-in-module remove-duplicates [ layer ] of hidden-members
+        
+        simulated-annealing-core-modular ? af training-data n-hidden-layers i
+        
+        recolor
+      ]
+      
+      set module-training-data ( skip module-training-data 1 )
+    ]
+  ]
+  
+  network-epoch-error data af n-hidden-layers
+  
+  set epoch-errors-per-module f-values-per-module
+  
+  tick
+  
+end
+
+to simulated-annealing-core-modular [ module af data n-hidden-layers index ]
+  
+  repeat iterations 
+  [
+    let hm hidden-members
+    let om output-members
+    let module-links links with [ any? ( turtle-set hm om ) with [ self = [ end2 ] of myself ] ]
+    
+    ask module-links
+    [
+      let new-value weight + get-weight-preturb
+      set new-value ifelse-value ( new-value > weight-bound ) [ weight-bound ] [ ifelse-value ( new-value < ( - weight-bound ) ) [ ( - weight-bound ) ] [ new-value ] ]
+      set new-weight new-value
+      
+      if ( clip-weights? )
+      [
+        set new-weight precision new-weight 5
+      ]
+    ]
+    
+    let new-error ( sse-modular module af ( task new-weight-induced-local-field ) data n-hidden-layers )
+    set f-new-values-per-module ( replace-item index f-new-values-per-module new-error )
+    
+    let delta-error new-error - ( item index f-values-per-module )
+    
+    ifelse delta-error <= 0
+    [
+      make-switch-modular module-links index
+    ]
+    [
+      let exponent ( delta-error / T-usable )
+      
+      if ( random-float 1 ) < ( e ^ ( -  exponent ) )
+      [
+        make-switch-modular module-links index
+      ]
+    ]
+    
+    recolor
+  ]
+  
+end
+
+to make-switch-modular [ _links index ]
+  
+  ask _links
+  [
+    set weight new-weight
+  ]
+  
+  let new-error item index f-new-values-per-module
+  
+  set f-values-per-module ( replace-item index f-values-per-module new-error )
+  
+end
+
+to sa-propagate-module [ module af induced-field-task n-hidden-layers ]
+  
+  ask module
+  [
+    foreach ( n-values n-hidden-layers [?] )
+    [
+      ask hidden-members with [ layer = ? ]
+      [
+        set local-field ( runresult induced-field-task )
+        set activation ( runresult af local-field )
+      ]
+    ]
+  
+    ask output-members
+    [
+      set local-field ( runresult induced-field-task )
+      set activation ( runresult af local-field )
+    ]
+  ]
+  
+end
+
+to-report sse-modular [ module af local-field-fun data n-hidden-layer ]
+  
+  let _error 0
+  
+  foreach data 
+  [
+    let in first ? 
+    let out last ?
+    
+    activate-inputs in
+    
+    sa-propagate-module module af local-field-fun n-hidden-layer
+    
+    calc-output-members-error module out
+    
+    set _error _error + sum [ err ^ 2 ] of output-nodes 
+  ]
+  
+  report _error
+  
+end

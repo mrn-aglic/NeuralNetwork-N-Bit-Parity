@@ -1,0 +1,63 @@
+to-report get-n-bit-parity-result [ inputs ]
+  
+  if length inputs < 2 [ print "insufficient length" report -1 ]
+  
+  let result ( first inputs ) = 1
+  
+  foreach but-first inputs
+  [
+    set result ( result xor ( ? = 1 ) )
+  ]
+  
+  report ifelse-value result [ 1 ] [ 0 ] 
+  
+end
+
+to-report target-n-bit-parity
+  
+  report get-n-bit-parity-target input-nodes
+  
+end
+
+to-report generate-dataset-entry
+  
+  report generate-n-element-dataset-entry ( count input-nodes )
+  
+end
+
+to-report generate-n-bit-parity-dataset [ _count ]
+  
+  report n-values _count [ generate-dataset-entry ] 
+  
+end
+
+to-report get-n-bit-parity-target [ nodes ]
+  
+  let inputs []
+  
+  foreach sort-on [ who ] nodes 
+  [
+      set inputs lput ( [ activation ] of ? ) inputs
+  ]
+  
+  report get-n-bit-parity-result inputs
+  
+end
+
+to-report generate-n-element-dataset-entry [ n ]
+  
+  let inputs [] 
+  
+  repeat n
+  [
+    set inputs fput ( random 2 ) inputs  
+  ] 
+  
+  let expected-result ( get-n-bit-parity-result inputs )
+  
+  let input-vector inputs
+  let output-vector (list expected-result)
+  
+  report ( list input-vector output-vector )
+  
+end

@@ -1,6 +1,16 @@
 __includes [
-  "code/utils.nls" "code/manipulationUtils.nls" "code/nn_positionNodes.nls" "code/backpropagation.nls" "code/learningutils.nls" "code/cross_validation.nls"
+  "code/utils.nls" "code/nn_positionNodes.nls" "code/backpropagation.nls" "code/activation-functions.nls" "code/learningutils.nls" "code/cross_validation.nls"
+  "code/n-bit-parity.nls"
+  "code/data-util.nls"
+  "code/simulated-annealing.nls"
+  "code/ffnn-common.nls"
   "testing/test-backpropagation.nls"
+  "modular/modular.nls"
+  "modular/homogenous.nls"
+  "modular/heterogenous.nls"
+  "modular/core.nls"
+  "modular/train.nls"
+  "modular/plotting-modular.nls"
   ]
 
 extensions [ table ]
@@ -34,6 +44,7 @@ hidden-nodes-own [
   activation
   layer
   local-gradient
+  err
 ]
 
 globals [
@@ -81,9 +92,6 @@ to setup
   set hidden-layer-seq -1
   set hidden-layer-num-nodes -1
 
-  set selected-first nobody
-  set selected-second nobody
-
   set nodes-per-hidden-layer table:make
 
   ifelse auto-hidden-number-of-nodes?
@@ -114,6 +122,8 @@ to setup
       set size 2
     ]
   ]
+
+  recolor
 
 end
 
@@ -168,13 +178,16 @@ end
 
 to create-nodes
 
-  create-bias-nodes num-hidden-layers + 1
+  if ( bias-on? )
   [
-    set color yellow
-    set activation 1
-    set layer -1
-    set added-to-layer? false
-    set input-bias? false
+    create-bias-nodes num-hidden-layers + 1
+    [
+      set color yellow
+      set activation 1
+      set layer -1
+      set added-to-layer? false
+      set input-bias? false
+    ]
   ]
 
   create-input-nodes num-in-nodes [ set color green ]
@@ -228,6 +241,35 @@ to update-layer [ layer-num num-nodes ]
   table:put nodes-per-hidden-layer layer-num num-nodes
 
 end
+
+to begin-train
+
+  ifelse training-algorithm = "back-propagate" or training-algorithm  = "back-propagate (update weights layer-by-layer)"
+  [
+    backpropagation-train load-data num-hidden-layers
+  ]
+  [
+    if training-algorithm = "simulated annealing"
+    [
+      simulated-annealing-train load-data num-hidden-layers
+    ]
+  ]
+
+end
+
+to-report load-data
+
+  let num-examples-predefined 1000
+
+  report ifelse-value ( data-source = "test" ) [ choose-test num-examples-predefined ] [ report-dataset ]
+
+end
+
+to-report choose-test [ num-examples-predefined ]
+
+  report ifelse-value ( target-function = "n-bit-parity" ) [ generate-n-bit-parity-dataset num-examples-predefined ] [ generate-test-dataset num-examples-predefined ]
+
+end
 @#$#@#$#@
 GRAPHICS-WINDOW
 604
@@ -257,25 +299,25 @@ ticks
 30.0
 
 SLIDER
-147
-14
-325
-47
+23
+60
+201
+93
 num-input-nodes
 num-input-nodes
 2
 20
-2
+4
 1
 1
 NIL
 HORIZONTAL
 
 SLIDER
-330
-15
-491
-48
+25
+104
+186
+137
 num-output-nodes
 num-output-nodes
 1
@@ -304,14 +346,14 @@ NIL
 1
 
 SLIDER
-15
-62
-162
-95
+215
+11
+405
+44
 num-hidden-layers
 num-hidden-layers
 0
-10
+30
 1
 1
 1
@@ -319,25 +361,25 @@ NIL
 HORIZONTAL
 
 SLIDER
-170
-63
-361
-96
+214
+54
+405
+87
 num-nodes-per-hidden-layer
 num-nodes-per-hidden-layer
 1
 30
-2
+4
 1
 1
 NIL
 HORIZONTAL
 
 SWITCH
-20
-109
-252
-142
+213
+97
+445
+130
 auto-hidden-number-of-nodes?
 auto-hidden-number-of-nodes?
 1
@@ -345,10 +387,10 @@ auto-hidden-number-of-nodes?
 -1000
 
 MONITOR
-12
-264
-480
-309
+26
+147
+494
+192
 Nodes per hidden layer
 nodes-per-hidden-layer
 17
@@ -356,10 +398,10 @@ nodes-per-hidden-layer
 11
 
 INPUTBOX
-140
-196
-279
-256
+150
+202
+289
+262
 hidden-layer-num-nodes
 -1
 1
@@ -367,10 +409,10 @@ hidden-layer-num-nodes
 Number
 
 BUTTON
-298
-195
-465
-228
+308
+201
+475
+234
 Update hidden layer table
 if is-number? hidden-layer-seq and is-number? hidden-layer-num-nodes\nand hidden-layer-seq >= 1 and hidden-layer-seq <= 10\nand hidden-layer-num-nodes >= 1 and hidden-layer-num-nodes <= 30 \n[ \n update-layer hidden-layer-seq hidden-layer-num-nodes\n]
 NIL
@@ -384,10 +426,10 @@ NIL
 1
 
 SWITCH
-19
-152
-208
-185
+412
+11
+601
+44
 uniform-hidden-layers?
 uniform-hidden-layers?
 0
@@ -395,105 +437,15 @@ uniform-hidden-layers?
 -1000
 
 INPUTBOX
-18
-194
-130
-254
+28
+200
+140
+260
 hidden-layer-seq
 -1
 1
 0
 Number
-
-BUTTON
-332
-109
-468
-142
-Remove link (mouse)
-remove-link-by-mouse
-T
-1
-T
-OBSERVER
-NIL
-NIL
-NIL
-NIL
-1
-
-BUTTON
-343
-154
-466
-187
-Clear selection
-clear-selection
-NIL
-1
-T
-OBSERVER
-NIL
-NIL
-NIL
-NIL
-1
-
-BUTTON
-478
-62
-583
-95
-select-node
-select-node
-T
-1
-T
-OBSERVER
-NIL
-NIL
-NIL
-NIL
-1
-
-BUTTON
-368
-63
-473
-96
-Remove link
-remove-link
-NIL
-1
-T
-OBSERVER
-NIL
-NIL
-NIL
-NIL
-1
-
-MONITOR
-476
-106
-572
-151
-selected-first
-selected-first
-17
-1
-11
-
-MONITOR
-475
-165
-591
-210
-selected-second
-selected-second
-17
-1
-11
 
 SLIDER
 425
@@ -544,7 +496,7 @@ std-deviation
 std-deviation
 0.1
 0.5
-0.1
+0.2
 0.1
 1
 NIL
@@ -557,7 +509,7 @@ CHOOSER
 450
 activation-function
 activation-function
-"logistic" "hyperbolic-tangent" "softsign"
+"step" "logistic" "hyperbolic-tangent" "softsign"
 1
 
 SLIDER
@@ -569,7 +521,7 @@ ahyper-const
 ahyper-const
 0.1
 4
-1
+0.8
 0.1
 1
 NIL
@@ -584,7 +536,7 @@ bhyper-const
 bhyper-const
 0.1
 4
-1
+0.6
 0.1
 1
 NIL
@@ -639,6 +591,7 @@ PENS
 "epoch-error" 1.0 0 -11221820 true "" "plot epoch-error"
 "validation-error" 1.0 0 -13840069 true "" "plot validation-error"
 "test-error" 1.0 0 -2674135 true "" "plot test-error"
+"f-error" 1.0 0 -7500403 true "" "plot f-error"
 
 BUTTON
 612
@@ -664,8 +617,8 @@ CHOOSER
 688
 target-function
 target-function
-"or" "xor"
-1
+"or" "and" "xor" "nand" "nor" "n-bit-parity"
+5
 
 CHOOSER
 8
@@ -674,16 +627,16 @@ CHOOSER
 404
 data-source
 data-source
-"file" "procedure"
-1
+"file" "procedure" "test"
+2
 
 BUTTON
-15
-321
-134
-354
+8
+318
+145
+351
 Load data
-get-dataset
+set-dataset
 NIL
 1
 T
@@ -695,10 +648,10 @@ NIL
 1
 
 SWITCH
-210
-151
-338
-184
+335
+617
+463
+650
 show-weights?
 show-weights?
 0
@@ -743,14 +696,340 @@ NIL
 1
 
 CHOOSER
-8
-604
-305
-649
-backprop-implementation
-backprop-implementation
-"back-propagate" "back-propagate (update weights layer-by-layer)"
+16
+614
+313
+659
+training-algorithm
+training-algorithm
+"back-propagate" "back-propagate (update weights layer-by-layer)" "simulated annealing"
+1
+
+SLIDER
+11
+722
+419
+755
+T
+T
 0
+10
+10
+0.05
+1
+NIL
+HORIZONTAL
+
+CHOOSER
+12
+812
+150
+857
+SA-termination
+SA-termination
+"temperature" "MSE" "iterations"
+0
+
+SLIDER
+11
+763
+419
+796
+iterations
+iterations
+0
+20000
+1500
+100
+1
+NIL
+HORIZONTAL
+
+SLIDER
+10
+863
+423
+896
+T-min
+T-min
+0
+1
+0.015
+0.005
+1
+NIL
+HORIZONTAL
+
+SLIDER
+7
+906
+420
+939
+MSE-threshold
+MSE-threshold
+0
+1
+0.02
+0.01
+1
+NIL
+HORIZONTAL
+
+SLIDER
+432
+763
+684
+796
+cooling-factor
+cooling-factor
+0
+1
+0.85
+0.05
+1
+NIL
+HORIZONTAL
+
+BUTTON
+17
+673
+119
+706
+NIL
+begin-train
+T
+1
+T
+OBSERVER
+NIL
+NIL
+NIL
+NIL
+1
+
+SLIDER
+429
+720
+790
+753
+preturb-limit
+preturb-limit
+0
+2
+0.2
+0.01
+1
+NIL
+HORIZONTAL
+
+SWITCH
+459
+54
+570
+87
+bias-on?
+bias-on?
+1
+1
+-1000
+
+SLIDER
+1489
+19
+1661
+52
+partition-size
+partition-size
+2
+10
+2
+1
+1
+NIL
+HORIZONTAL
+
+SLIDER
+1477
+62
+1664
+95
+num-modular-networks
+num-modular-networks
+1
+4
+1
+1
+1
+NIL
+HORIZONTAL
+
+BUTTON
+1683
+16
+1872
+49
+Make n modular networks
+make-n-modular-networks
+NIL
+1
+T
+OBSERVER
+NIL
+NIL
+NIL
+NIL
+1
+
+BUTTON
+1700
+68
+1861
+101
+Begin train modular
+begin-train-modular
+T
+1
+T
+OBSERVER
+NIL
+NIL
+NIL
+NIL
+1
+
+SLIDER
+429
+809
+684
+842
+weight-bound
+weight-bound
+0
+5
+2
+1
+1
+NIL
+HORIZONTAL
+
+SLIDER
+426
+575
+598
+608
+step-threshold
+step-threshold
+0
+1
+0.5
+0.1
+1
+NIL
+HORIZONTAL
+
+MONITOR
+181
+804
+250
+849
+NIL
+T-usable
+17
+1
+11
+
+MONITOR
+1474
+120
+1822
+165
+Activation of input-nodes
+input-activations
+17
+1
+11
+
+MONITOR
+1474
+178
+1820
+223
+Activation of output-nodes
+output-activations
+17
+1
+11
+
+SWITCH
+1420
+236
+1559
+269
+clip-weights?
+clip-weights?
+1
+1
+-1000
+
+BUTTON
+1576
+236
+1708
+269
+Train by module
+train-by-module
+T
+1
+T
+OBSERVER
+NIL
+NIL
+NIL
+NIL
+1
+
+BUTTON
+1724
+239
+1856
+272
+Train by module
+train-by-module
+NIL
+1
+T
+OBSERVER
+NIL
+NIL
+NIL
+NIL
+1
+
+PLOT
+1418
+281
+1841
+568
+Error vs Epochs per module
+NIL
+NIL
+0.0
+10.0
+0.0
+10.0
+true
+true
+"" ""
+PENS
+"epoch-error" 1.0 0 -2674135 true "" "plot epoch-error"
+"module-0" 1.0 0 -5207188 true "" "if is-list? epoch-errors-per-module and length epoch-errors-per-module > 0 [ plot item 0 epoch-errors-per-module ]"
+"module-1" 1.0 0 -1184463 true "" "if is-list? epoch-errors-per-module and length epoch-errors-per-module > 1 [ plot item 1 epoch-errors-per-module ]"
+"module-2" 1.0 0 -7500403 true "" "if is-list? epoch-errors-per-module and length epoch-errors-per-module > 2 [ plot item 2 epoch-errors-per-module ]"
+"module-3" 1.0 0 -13840069 true "" "if is-list? epoch-errors-per-module and length epoch-errors-per-module > 3 [ plot item 3 epoch-errors-per-module ]"
+"module-4" 1.0 0 -11221820 true "" "if is-list? epoch-errors-per-module and length epoch-errors-per-module > 4 [ plot item 4 epoch-errors-per-module ]"
+"module-5" 1.0 0 -13345367 true "" "if is-list? epoch-errors-per-module and length epoch-errors-per-module > 5 [ plot item 5 epoch-errors-per-module ]"
+"module-6" 1.0 0 -8630108 true "" "if is-list? epoch-errors-per-module and length epoch-errors-per-module > 6 [ plot item 6 epoch-errors-per-module ]"
+"module-7" 1.0 0 -5825686 true "" "if is-list? epoch-errors-per-module and length epoch-errors-per-module > 7 [ plot item 7 epoch-errors-per-module ]"
 
 @#$#@#$#@
 ## WHAT IS IT?
@@ -1109,7 +1388,7 @@ Polygon -7500403 true true 270 75 225 30 30 225 75 270
 Polygon -7500403 true true 30 75 75 30 270 225 225 270
 
 @#$#@#$#@
-NetLogo 5.2.1
+NetLogo 5.3
 @#$#@#$#@
 @#$#@#$#@
 @#$#@#$#@

@@ -1,0 +1,21 @@
+to homogenous-net [ layers-num ]
+  
+  create-homogenous-modular-network layers-num 
+  
+end
+
+to create-homogenous-modular-network [ layers-num ]
+  
+  let N partition-size
+  
+  let hx max-pxcor / ( layers-num + 3 )
+  
+  construct-modules-homogenous hx layers-num N
+  
+end
+
+to construct-modules-homogenous [ hx layers-num m ]
+  
+  construct-modules hx layers-num m 0
+  
+end
